@@ -278,7 +278,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     if err != nil || len(assetBytes)==0{
         // This implies that this is a 'create' scenario
          stateStub = stateIn // The record that goes into the stub is the one that cme in
-		   fmt.Printf("create1")
+		   fmt.Println("create1")
     } 
     stateJSON, err := json.Marshal(stateStub)
     if err != nil {
