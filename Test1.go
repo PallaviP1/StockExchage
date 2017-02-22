@@ -289,7 +289,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
  
     // Write the new state to the ledger
     err = stub.PutState(assetID, stateJSON)
-	  fmt.println("CreateN")
+	  fmt.Println("Json= ",stateJSON)
     if err != nil {
         err = errors.New("PUT ledger state failed: "+ fmt.Sprint(err))            
         return nil, err
