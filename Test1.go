@@ -457,16 +457,11 @@ type ContractState struct {
     Version      string                        `json:"version"`
 }
 
-type Geolocation struct {
-    Latitude    *float64 `json:"latitude,omitempty"`
-    Longitude   *float64 `json:"longitude,omitempty"`
-}
+
 
 type AssetState struct {
     AssetID        *string       `json:"assetID,omitempty"`        // all assets must have an ID, primary key of contract
-    Location       *Geolocation  `json:"location,omitempty"`       // current asset location
-    Temperature    *float64      `json:"temperature,omitempty"`    // asset temp
-    Carrier        *string       `json:"carrier,omitempty"`        // the name of the carrier
+ 
 }
 
 var contractState = ContractState{MYVERSION}
@@ -504,6 +499,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 // ************************************
 func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
     // Handle different functions
+	fmt.Printf("createMain")
     if function == "createAsset" {
         // create assetID
 		 fmt.Printf("createMain")

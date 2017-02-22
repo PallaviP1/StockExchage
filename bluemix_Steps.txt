@@ -41,6 +41,13 @@ e5d18afc298dc5bef3590ce04fccfbe28babf44958d85fd0e6c2105c4bd41576c6d37a02017d4d68
 
 "865b0df058c02fb2e26adcd03810de3d2c4bc22c00362e169c1dd215d4de4ded896607022f894f957b24d47e6a3ef690bf4e639a915c8aa36d30ae858a1f94a7"
 
+6fdbd0257f7a6f04291af646a7ab3c4c1c9b6c2c2966dc618d3a78f61d884ba7e0d9d215130afaf717a64d6a95a52a50b3e8357f03780c372c912ec16dfdc5c9
+
+https://a5fe439fc1bd41058ef39f9a884ac8eb-vp0.us.blockchain.ibm.com:5001/chaincode
+
+02871b6b516f4a2344bdc85c87cd744824a4d9389a5d59908c7b2fbfc91ad01464579b96e4e34e53e45d29fd0057a85882bbc1d93ef29cce2f57db1be283462e
+https://a5fe439fc1bd41058ef39f9a884ac8eb-vp0.us.blockchain.ibm.com:5001/chaincode
+
 {
   "jsonrpc": "2.0",
   "method": "query",
@@ -66,7 +73,7 @@ e5d18afc298dc5bef3590ce04fccfbe28babf44958d85fd0e6c2105c4bd41576c6d37a02017d4d68
   "params": {
     "type": 1,
     "chaincodeID": {
-      "name": "865b0df058c02fb2e26adcd03810de3d2c4bc22c00362e169c1dd215d4de4ded896607022f894f957b24d47e6a3ef690bf4e639a915c8aa36d30ae858a1f94a7"
+      "name": "6fdbd0257f7a6f04291af646a7ab3c4c1c9b6c2c2966dc618d3a78f61d884ba7e0d9d215130afaf717a64d6a95a52a50b3e8357f03780c372c912ec16dfdc5c9"
     },
     "ctorMsg": {"Function":"`createAsset`", "Args":["{\"assetID\":\"CON123\", \"location\":{\"latitude\":34, \"longitude\":23}, \"temperature\":89, \"carrier\":\"ABCCARRIER\"}"]},
     "secureContext": "user_type1_0"
