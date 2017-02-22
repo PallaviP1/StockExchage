@@ -96,15 +96,9 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 	fmt.Println(function)
     if function == "createAsset" {
         // create assetID
-		 fmt.Println("creat1")
+		 fmt.Println("create1")
         return t.createAsset(stub, args)
-    } else if function == "updateAsset" {
-        // create assetID
-        return t.updateAsset(stub, args)
-    } else if function == "deleteAsset" {
-        // Deletes an asset by ID from the ledger
-        return t.deleteAsset(stub, args)
-    }
+    } 
     return nil, errors.New("Received unknown invocation: " + function)
 }
 
@@ -142,35 +136,7 @@ func (t *SimpleChaincode) createAsset(stub shim.ChaincodeStubInterface, args []s
     return nil, erval
 }
 
-//******************** updateAsset ********************/
 
-func (t *SimpleChaincode) updateAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-     _,erval:=t. createOrUpdateAsset(stub, args)
-    return nil, erval
-}
-
-
-//******************** deleteAsset ********************/
-
-func (t *SimpleChaincode) deleteAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-    var assetID string // asset ID
-    var err error
-    var stateIn AssetState
-
-    // validate input data for number of args, Unmarshaling to asset state and obtain asset id
-    stateIn, err = t.validateInput(args)
-    if err != nil {
-        return nil, err
-    }
-    assetID = *stateIn.AssetID
-    // Delete the key / asset from the ledger
-    err = stub.DelState(assetID)
-    if err != nil {
-        err = errors.New("DELSTATE failed! : "+ fmt.Sprint(err))
-       return nil, err
-    }
-    return nil, nil
-}
 
 /******************* Query Methods ***************/
 
