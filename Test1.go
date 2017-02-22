@@ -93,7 +93,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 // ************************************
 func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
     // Handle different functions
-	fmt.Println("createMain")
+	fmt.Println(function)
     if function == "createAsset" {
         // create assetID
 		 fmt.Println("creat1")
@@ -264,7 +264,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     var stateIn AssetState
     var stateStub AssetState
    
-
+  fmt.Println("c1")
     // validate input data for number of args, Unmarshaling to asset state and obtain asset id
 
     stateIn, err = t.validateInput(args)
