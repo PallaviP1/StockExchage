@@ -99,6 +99,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		 fmt.Println("create1")
         return t.createAsset(stub, args)
     } 
+		fmt.Println("end")
     return nil, errors.New("Received unknown invocation: " + function)
 }
 
