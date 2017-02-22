@@ -96,8 +96,8 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 	fmt.Println(function)
     if function == "createAsset" {
         // create assetID
-		 fmt.Println("create1")
-        return t.createAsset(stub, args)
+		 return t.createAsset(stub, args)
+		 
     } 
 		fmt.Println("end")
     return nil, errors.New("Received unknown invocation: " + function)
@@ -122,7 +122,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 func main() {
     err := shim.Start(new(SimpleChaincode))
     if err != nil {
-        fmt.Printf("Error starting Simple Chaincode: %s", err)
+        fmt.Println("Error starting Simple Chaincode: %s", err)
     }
 }
 
@@ -133,6 +133,7 @@ func main() {
 /******************** createAsset ********************/
 
 func (t *SimpleChaincode) createAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+fmt.Println("C1")
     _,erval:=t. createOrUpdateAsset(stub, args)
     return nil, erval
 }
@@ -231,7 +232,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     var stateIn AssetState
     var stateStub AssetState
    
-  fmt.Println("c1")
+	fmt.Println("c2")
     // validate input data for number of args, Unmarshaling to asset state and obtain asset id
 
     stateIn, err = t.validateInput(args)
