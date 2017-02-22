@@ -48,6 +48,9 @@ https://a5fe439fc1bd41058ef39f9a884ac8eb-vp0.us.blockchain.ibm.com:5001/chaincod
 02871b6b516f4a2344bdc85c87cd744824a4d9389a5d59908c7b2fbfc91ad01464579b96e4e34e53e45d29fd0057a85882bbc1d93ef29cce2f57db1be283462e
 https://a5fe439fc1bd41058ef39f9a884ac8eb-vp0.us.blockchain.ibm.com:5001/chaincode
 
+854c70126b9dfa5624d6fd9d00b14d805bfb5bf9c1fd6bf921d4d2d18a0fc797506d676428299016051883677bf57295ff8a007cf6288e6a4d3d2f47ec7ae12c
+https://a5fe439fc1bd41058ef39f9a884ac8eb-vp0.us.blockchain.ibm.com:5001/chaincode
+
 {
   "jsonrpc": "2.0",
   "method": "query",
