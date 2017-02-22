@@ -1,0 +1,94 @@
+create a new repository on the command line
+
+echo "# StockExchage" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/PallaviP1/StockExchage.git
+git push -u origin master
+
+
+
+https://github.com/PallaviP1/StockExchage
+
+
+a1da3419d4f0bc639cf45f50aa845c76415d22d1f8a49e41e89b9a3c8939bfa8aa6076b63e66153b1552cb0ff4c60327686d30c60bc710ee3ce9a622eccc545d
+
+
+{
+  "jsonrpc": "2.0",
+  "method": "deploy",
+  "params": {
+    "type": 1,
+    "chaincodeID": {
+      "path": "https://github.com/PallaviP1/StockExchage"
+    },
+    "ctorMsg": {
+      "function": "init",
+      "args": [
+        "{\"version\":\"1.0\"}"
+      ]
+    },
+    "secureContext": "user_type1_0"
+  },
+  "id": 0
+}
+
+
+e5d18afc298dc5bef3590ce04fccfbe28babf44958d85fd0e6c2105c4bd41576c6d37a02017d4d6885c9d3e1434051a8619c37c92dbc07851c89b799c12fada4
+
+"e5d18afc298dc5bef3590ce04fccfbe28babf44958d85fd0e6c2105c4bd41576c6d37a02017d4d6885c9d3e1434051a8619c37c92dbc07851c89b799c12fada4"
+
+"865b0df058c02fb2e26adcd03810de3d2c4bc22c00362e169c1dd215d4de4ded896607022f894f957b24d47e6a3ef690bf4e639a915c8aa36d30ae858a1f94a7"
+
+{
+  "jsonrpc": "2.0",
+  "method": "query",
+  "params": {
+    "type": 1,
+    "chaincodeID": {
+      "name": "865b0df058c02fb2e26adcd03810de3d2c4bc22c00362e169c1dd215d4de4ded896607022f894f957b24d47e6a3ef690bf4e639a915c8aa36d30ae858a1f94a7"
+    },
+    "ctorMsg": {"Function":"readAssetSamples", "Args":[]},
+    "secureContext": "user_type1_0"
+  },
+  "id": 0
+}
+
+
+
+"7c5688fc-d7c0-4f7f-b2a0-a0306f06282b"
+
+
+{
+  "jsonrpc": "2.0",
+  "method": "invoke",
+  "params": {
+    "type": 1,
+    "chaincodeID": {
+      "name": "865b0df058c02fb2e26adcd03810de3d2c4bc22c00362e169c1dd215d4de4ded896607022f894f957b24d47e6a3ef690bf4e639a915c8aa36d30ae858a1f94a7"
+    },
+    "ctorMsg": {"Function":"`createAsset`", "Args":["{\"assetID\":\"CON123\", \"location\":{\"latitude\":34, \"longitude\":23}, \"temperature\":89, \"carrier\":\"ABCCARRIER\"}"]},
+    "secureContext": "user_type1_0"
+  },
+  "id": 0
+}
+
+read asset
+
+{
+  "jsonrpc": "2.0",
+  "method": "query",
+  "params": {
+    "type": 1,
+    "chaincodeID": {
+      "name": "865b0df058c02fb2e26adcd03810de3d2c4bc22c00362e169c1dd215d4de4ded896607022f894f957b24d47e6a3ef690bf4e639a915c8aa36d30ae858a1f94a7"
+    },
+    "ctorMsg": {"Function":"readAsset", "Args":["{\"assetID\":\"CON123\"}"]},
+    "secureContext": "user_type1_0"
+  },
+  "id": 0
+}
+
+
+0c8b1e5e7e9eb39942ca6744d93ef12cafad1a348dc6b637ec4919a29859f60af90ab9634af5b601cd9e6e23410567c1af5488bf70cd9f0b283d4ab419634f6d
