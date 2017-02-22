@@ -506,6 +506,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
     // Handle different functions
     if function == "createAsset" {
         // create assetID
+		 fmt.Printf("createMain")
         return t.createAsset(stub, args)
     } else if function == "updateAsset" {
         // create assetID
@@ -702,6 +703,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
          stateStub = stateIn // The record that goes into the stub is the one that cme in
 		   fmt.Printf("create1")
     } else {
+	 fmt.Printf("create2")
         // This is an update scenario
         err = json.Unmarshal(assetBytes, &stateStub)
         if err != nil {
@@ -722,9 +724,10 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     }
     // Get existing state from the stub
     
-   fmt.Printf(stateJSON)
+ 
     // Write the new state to the ledger
     err = stub.PutState(assetID, stateJSON)
+	  fmt.Sprint(err)
     if err != nil {
         err = errors.New("PUT ledger state failed: "+ fmt.Sprint(err))            
         return nil, err
