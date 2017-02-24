@@ -301,6 +301,8 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
         }
     }*/
     stateJSON, err := json.Marshal(stateStub)
+	 s := string(stateJSON)
+    fmt.Println("s= ",s)
     /*if err != nil {
         return nil, errors.New("Marshal failed for contract state" + fmt.Sprint(err))
     }*/
