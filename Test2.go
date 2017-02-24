@@ -312,10 +312,12 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     fmt.Println("stateJSON= ", stateJSON)
     // Write the new state to the ledger
     err = stub.PutState(assetID, stateJSON)
-   /* if err != nil {
-        err = errors.New("PUT ledger state failed: "+ fmt.Sprint(err))            
+ if err != nil {
+        err = errors.New("PUT ledger state failed: "+ fmt.Sprint(err))  
+  fmt.Println("err= ", err)		
         return nil, err
-    } */
+    } 
+	 fmt.Println("Success")		
     return nil, nil
 }
 /*********************************  internal: mergePartialState ****************************/	
