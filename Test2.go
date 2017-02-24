@@ -280,7 +280,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     // Check if asset record existed in stub
     assetBytes, err:= stub.GetState(assetID)
 	stateStub = stateIn
-	fmt.Println("aasetbyte= ", assetBytes)
+	fmt.Println("assetbyte= ", assetBytes)
    /* if err != nil || len(assetBytes)==0{
         // This implies that this is a 'create' scenario
          stateStub = stateIn // The record that goes into the stub is the one that cme in
@@ -305,7 +305,8 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     }*/
     // Get existing state from the stub
     
-  
+  fmt.Println("stateStub= ", stateStub)
+    fmt.Println("stateJSON= ", stateJSON)
     // Write the new state to the ledger
     err = stub.PutState(assetID, stateJSON)
    /* if err != nil {
