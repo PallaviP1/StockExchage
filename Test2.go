@@ -268,7 +268,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     var stateStub AssetState
   
   fmt.Println("c6")
-
+  assetID = *stateIn.AssetID
 
     // validate input data for number of args, Unmarshaling to asset state and obtain asset id
 	
@@ -280,9 +280,9 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
  fmt.Println("stateIn= ", stateIn)
     // Check if asset record existed in stub
     assetBytes, err:= stub.GetState(assetID)
-	stateStub = stateIn
+	//stateStub = stateIn
 	fmt.Println("assetbyte= ", assetBytes)
-   /* if err != nil || len(assetBytes)==0{
+    if err != nil || len(assetBytes)==0{
         // This implies that this is a 'create' scenario
          stateStub = stateIn // The record that goes into the stub is the one that cme in
     } else {
@@ -299,19 +299,19 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
             err = errors.New("Unable to merge state")
             return nil,err
         }
-    }*/
+    }
     stateJSON, err := json.Marshal(stateStub)
 	 s := string(stateJSON)
     fmt.Println("s= ",s)
-    /*if err != nil {
+    if err != nil {
         return nil, errors.New("Marshal failed for contract state" + fmt.Sprint(err))
-    }*/
+    }
     // Get existing state from the stub
      fmt.Println("stateStub= ", stateStub)
   fmt.Println("assetID= ", stateStub)
     fmt.Println("stateJSON= ", stateJSON)
     // Write the new state to the ledger
-    err = stub.PutState("assetID", stateJSON)
+    err = stub.PutState(assetID, stateJSON)
  if err != nil {
         err = errors.New("PUT ledger state failed: "+ fmt.Sprint(err))  
   fmt.Println("err= ", err)		
