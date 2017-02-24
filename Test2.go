@@ -256,7 +256,7 @@ func (t *SimpleChaincode) validateInput(args []string) (stateIn AssetState, err 
 	  assetID = strings.TrimSpace(*stateIn.AssetID)
     fmt.Println("assetID1= ", assetID)
     
-    stateIn.AssetID = &assetID
+    stateIn.AssetID = assetID
     return stateIn, nil
 }
 //******************** createOrUpdateAsset ********************/
