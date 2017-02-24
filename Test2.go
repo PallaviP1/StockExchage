@@ -314,7 +314,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
         err = errors.New("PUT ledger state failed: "+ fmt.Sprint(err))            
         return nil, err
     } */
-    return stateStub, nil
+    return nil, nil
 }
 /*********************************  internal: mergePartialState ****************************/	
  func (t *SimpleChaincode) mergePartialState(oldState AssetState, newState AssetState) (AssetState,  error) {
