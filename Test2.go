@@ -276,7 +276,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
         return nil, err
     }
 	fmt.Println("Hello")
-
+ fmt.Println("stateIn= ", stateIn)
     // Check if asset record existed in stub
     assetBytes, err:= stub.GetState(assetID)
 	stateStub = stateIn
@@ -304,8 +304,8 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
         return nil, errors.New("Marshal failed for contract state" + fmt.Sprint(err))
     }*/
     // Get existing state from the stub
-    
-  fmt.Println("stateStub= ", stateStub)
+     fmt.Println("stateStub= ", stateStub)
+  fmt.Println("assetID= ", assetID)
     fmt.Println("stateJSON= ", stateJSON)
     // Write the new state to the ledger
     err = stub.PutState(assetID, stateJSON)
