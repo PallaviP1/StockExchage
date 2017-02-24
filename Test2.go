@@ -95,14 +95,18 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
     // Handle different functions
     if function == "createAsset" {
         // create assetID
+		fmt.Println("c1")
         return t.createAsset(stub, args)
     } else if function == "updateAsset" {
         // create assetID
+			fmt.Println("c2")
         return t.updateAsset(stub, args)
     } else if function == "deleteAsset" {
         // Deletes an asset by ID from the ledger
+			fmt.Println("c3")
         return t.deleteAsset(stub, args)
     }
+	fmt.Println("c4")
     return nil, errors.New("Received unknown invocation: " + function)
 }
 
@@ -260,11 +264,11 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     var stateIn AssetState
     var stateStub AssetState
   
-  
+  fmt.Println("c6")
 
 
     // validate input data for number of args, Unmarshaling to asset state and obtain asset id
-	fmt.Println("c2")
+	
     stateIn, err = t.validateInput(args)
     if err != nil {
         return nil, err
