@@ -25,7 +25,7 @@ import (
     "encoding/json"
     "errors"
     "fmt"
-   // "strings"
+   "strings"
      "reflect"
     "github.com/hyperledger/fabric/core/chaincode/shim"
 )
@@ -253,7 +253,8 @@ func (t *SimpleChaincode) validateInput(args []string) (stateIn AssetState, err 
         err = errors.New("Asset id is mandatory in the input JSON data")
         return state, err
     }*/
-    
+	  assetID = strings.TrimSpace(*stateIn.AssetID)
+    fmt.Println("assetID1= ", assetID)
     
     stateIn.AssetID = &assetID
     return stateIn, nil
