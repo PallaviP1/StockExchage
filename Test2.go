@@ -254,9 +254,9 @@ func (t *SimpleChaincode) validateInput(args []string) (stateIn AssetState, err 
         return state, err
     }*/
 	  assetID = strings.TrimSpace(*stateIn.AssetID)
-    fmt.Println("assetID1= ", assetID)
+    fmt.Println("assetIDAdd= ", &assetID)
     
-    stateIn.AssetID = assetID
+    stateIn.AssetID = &assetID
     return stateIn, nil
 }
 //******************** createOrUpdateAsset ********************/
@@ -306,7 +306,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     }*/
     // Get existing state from the stub
      fmt.Println("stateStub= ", stateStub)
-  fmt.Println("assetID= ", assetID)
+  fmt.Println("assetID= ", stateStub)
     fmt.Println("stateJSON= ", stateJSON)
     // Write the new state to the ledger
     err = stub.PutState(assetID, stateJSON)
