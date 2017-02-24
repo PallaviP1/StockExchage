@@ -267,9 +267,6 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     var stateIn AssetState
     var stateStub AssetState
   
-  fmt.Println("c6")
- 
-
     // validate input data for number of args, Unmarshaling to asset state and obtain asset id
 	
     stateIn, err = t.validateInput(args)
@@ -277,8 +274,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     if err != nil {
         return nil, err
     }
-	fmt.Println("Hello")
- fmt.Println("stateIn= ", stateIn)
+	
     // Check if asset record existed in stub
     assetBytes, err:= stub.GetState(assetID)
 	//stateStub = stateIn
@@ -302,23 +298,20 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
         }
     }
     stateJSON, err := json.Marshal(stateStub)
-	 s := string(stateJSON)
-    fmt.Println("s= ",s)
+	
     if err != nil {
         return nil, errors.New("Marshal failed for contract state" + fmt.Sprint(err))
     }
     // Get existing state from the stub
-     fmt.Println("stateStub= ", stateStub)
-  fmt.Println("assetID= ", stateStub)
-    fmt.Println("stateJSON= ", stateJSON)
+    
     // Write the new state to the ledger
     err = stub.PutState(assetID, stateJSON)
  if err != nil {
         err = errors.New("PUT ledger state failed: "+ fmt.Sprint(err))  
-  fmt.Println("err= ", err)		
+ 	
         return nil, err
     } 
-	 fmt.Println("Success")		
+		
     return nil, nil
 }
 /*********************************  internal: mergePartialState ****************************/	
