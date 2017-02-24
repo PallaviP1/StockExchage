@@ -218,11 +218,49 @@ func (t *SimpleChaincode) readAssetObjectModel(stub shim.ChaincodeStubInterface,
     return stateJSON, nil
 }
 
-
 // ************************************
 // validate input data : common method called by the CRUD functions
 // ************************************
 func (t *SimpleChaincode) validateInput(args []string) (stateIn AssetState, err error) {
+    var assetID string // asset ID
+    var state AssetState = AssetState{} // The calling function is expecting an object of type AssetState
+
+    if len(args) !=1 {
+        err = errors.New("Incorrect number of arguments. Expecting a JSON strings with mandatory assetID")
+        return state, err
+    }
+    jsonData:=args[0]
+    assetID = ""
+    stateJSON := []byte(jsonData)
+    err = json.Unmarshal(stateJSON, &stateIn)
+    if err != nil {
+        err = errors.New("Unable to unmarshal input JSON data")
+        return state, err
+        // state is an empty instance of asset state
+    }      
+    // was assetID present?
+    // The nil check is required because the asset id is a pointer. 
+    // If no value comes in from the json input string, the values are set to nil
+    
+    if stateIn.AssetID !=nil { 
+        assetID = strings.TrimSpace(*stateIn.AssetID)
+        if assetID==""{
+            err = errors.New("AssetID not passed")
+            return state, err
+        }
+    } else {
+        err = errors.New("Asset id is mandatory in the input JSON data")
+        return state, err
+    }
+    
+    
+    stateIn.AssetID = &assetID
+    return stateIn, nil
+}
+// ************************************
+// validate input data : common method called by the CRUD functions
+// ************************************
+func (t *SimpleChaincode) validateInput1(args []string) (stateIn AssetState, err error) {
     var assetID string // asset ID
     var state AssetState = AssetState{} // The calling function is expecting an object of type AssetState
 
@@ -273,7 +311,7 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     // validate input data for number of args, Unmarshaling to asset state and obtain asset id
 	
     stateIn, err = t.validateInput(args)
-	 assetID = *stateIn.AssetID
+	assetID = *stateIn.AssetID
     if err != nil {
         return nil, err
     }
