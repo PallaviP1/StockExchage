@@ -25,7 +25,7 @@ import (
     "encoding/json"
     "errors"
     "fmt"
-    "strings"
+   // "strings"
      "reflect"
     "github.com/hyperledger/fabric/core/chaincode/shim"
 )
@@ -654,7 +654,7 @@ func (t *SimpleChaincode) validateInput(args []string) (stateIn AssetState, err 
     assetID = ""
     stateJSON := []byte(jsonData)
     err = json.Unmarshal(stateJSON, &stateIn)
-    if err != nil {
+   /* if err != nil {
         err = errors.New("Unable to unmarshal input JSON data")
         return state, err
         // state is an empty instance of asset state
@@ -672,7 +672,7 @@ func (t *SimpleChaincode) validateInput(args []string) (stateIn AssetState, err 
     } else {
         err = errors.New("Asset id is mandatory in the input JSON data")
         return state, err
-    }
+    }*/
     
     
     stateIn.AssetID = &assetID
