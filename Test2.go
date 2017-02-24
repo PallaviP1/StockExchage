@@ -268,11 +268,12 @@ func (t *SimpleChaincode) createOrUpdateAsset(stub shim.ChaincodeStubInterface, 
     var stateStub AssetState
   
   fmt.Println("c6")
-  assetID = *stateIn.AssetID
+ 
 
     // validate input data for number of args, Unmarshaling to asset state and obtain asset id
 	
     stateIn, err = t.validateInput(args)
+	 assetID = *stateIn.AssetID
     if err != nil {
         return nil, err
     }
