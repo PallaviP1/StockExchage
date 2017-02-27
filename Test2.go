@@ -116,7 +116,9 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
         return t.readAsset(stub, args)
     } else if function =="readAssetObjectModel" {
         return t.readAssetObjectModel(stub, args)
-    }  
+    } else if function =="readAllAssets" {
+         return t.readAllAssets(stub, args)
+    }   
     return nil, errors.New("Received unknown invocation: " + function)
 }
 
@@ -198,6 +200,55 @@ func (t *SimpleChaincode) readAsset(stub shim.ChaincodeStubInterface, args []str
     }
     return assetBytes, nil
 }
+
+func (t *SimpleChaincode) readAllAssets(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var sAssetKey string
+	var err error
+	var results []interface{}
+	var state interface{}
+
+	if len(args) > 0 {
+		err = errors.New("readAllAssets expects no arguments")
+			fmt.Println(err)
+		return nil, err
+	}
+
+	aa, err := getActiveAssets(stub)
+	if err != nil {
+		err = fmt.Errorf("readAllAssets failed to get the active assets: %s", err)
+			fmt.Println(err)
+		return nil, err
+	}
+	results = make([]interface{}, 0, len(aa))
+	for i := range aa {
+		sAssetKey = aa[i]
+		// Get the state from the ledger
+		assetBytes, err := stub.GetState(sAssetKey)
+		if err != nil {
+			// best efforts, return what we can
+				fmt.Println("readAllAssets assetID %s failed GETSTATE", sAssetKey)
+			continue
+		} else {
+			err = json.Unmarshal(assetBytes, &state)
+			if err != nil {
+				// best efforts, return what we can
+					fmt.Println("readAllAssets assetID %s failed to unmarshal", sAssetKey)
+				continue
+			}
+			results = append(results, state)
+		}
+	}
+
+	resultsStr, err := json.Marshal(results)
+	if err != nil {
+		err = fmt.Errorf("readallAssets failed to marshal results: %s", err)
+			fmt.Println(err)
+		return nil, err
+	}
+
+	return []byte(resultsStr), nil
+}
+
 
 //*************readAssetObjectModel*****************/
 
