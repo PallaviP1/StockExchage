@@ -2365,7 +2365,7 @@ func (alerts *AlertStatusInternal) calculateContractCompliance (a *ArgsMap) (boo
 // ************************************
 func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var accountID string
-	var accountType string
+	
 	var accountName string
 	var argsMap ArgsMap
 	var event interface{}
