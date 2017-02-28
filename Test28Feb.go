@@ -1393,6 +1393,9 @@ func GETContractStateFromLedger(stub shim.ChaincodeStubInterface) (ContractState
     if state.ActiveAssets == nil {
         state.ActiveAssets = make(map[string]bool)
     }
+	 if state.ActiveAccounts == nil {
+        state.ActiveAccounts = make(map[string]bool)
+    }
     log.Debug("GETContractState successful")
     return state, nil 
 }
@@ -2362,7 +2365,7 @@ func (alerts *AlertStatusInternal) calculateContractCompliance (a *ArgsMap) (boo
 // ************************************
 func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var accountID string
-	
+	var accountType string
 	var accountName string
 	var argsMap ArgsMap
 	var event interface{}
@@ -2429,7 +2432,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 
 	
 	sAccountKey := accountID 
-	found = assetIsActive(stub, sAccountKey)
+	found = accountIsActive(stub, sAccountKey)
 	if found {
 		err := fmt.Errorf("createAsset arg asset %s already exists", accountID)
 		log.Error(err)
@@ -2494,7 +2497,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	log.Infof("createAccount accountID  state %s successfully written to ledger: %s", accountID,  string(stateJSON))
 
 	// add asset to contract state
-	err = addAssetToContractState(stub, sAccountKey)
+	err = addAccountToContractState(stub, sAccountKey)
 	if err != nil {
 		err := fmt.Errorf("createAccount asset %s  failed to write asset state: %s", accountID,  err)
 		log.Critical(err)
@@ -2518,3 +2521,23 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	return nil, nil
 }
 
+func accountIsActive(stub shim.ChaincodeStubInterface, sAssetKey string) (bool) {
+    var state ContractState
+    var err error
+    state, err = GETContractStateFromLedger(stub)
+    if err != nil { return false}
+    found, _ := state.ActiveAccounts[sAssetKey]
+    return found
+}
+
+func addAccountToContractState(stub shim.ChaincodeStubInterface, sAssetKey string) (error) {
+    var state ContractState
+    var err error
+    state, err = GETContractStateFromLedger(stub)  
+    if err != nil {
+        return err
+    }
+    log.Debugf("Adding asset %s to contract", sAssetKey)
+    state.ActiveAccounts[sAssetKey] = true
+    return PUTContractStateToLedger(stub, state)
+}
