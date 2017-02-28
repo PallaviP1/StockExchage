@@ -149,7 +149,7 @@ func main() {
 }
 
 // Init is called in deploy mode when contract is initialized
-func (t *SimpleChaincode) Init(stub *shim.ChaincodeStub, function string, args []string) ([]byte, error) {
+func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	var stateArg ContractState
 	var err error
 
@@ -184,7 +184,7 @@ func (t *SimpleChaincode) Init(stub *shim.ChaincodeStub, function string, args [
 }
 
 // Invoke is called in invoke mode to delegate state changing function messages
-func (t *SimpleChaincode) Invoke(stub *shim.ChaincodeStub, function string, args []string) ([]byte, error) {
+func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	if function == "createAsset" {
 		return t.createAsset(stub, args)
 	} else if function == "updateAsset" {
@@ -206,7 +206,7 @@ func (t *SimpleChaincode) Invoke(stub *shim.ChaincodeStub, function string, args
 }
 
 // Query is called in query mode to delegate non-state-changing queries
-func (t *SimpleChaincode) Query(stub *shim.ChaincodeStub, function string, args []string) ([]byte, error) {
+func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	if function == "readAsset" {
 		return t.readAsset(stub, args)
 	} else if function == "readAllAssets" {
@@ -237,7 +237,7 @@ func (t *SimpleChaincode) Query(stub *shim.ChaincodeStub, function string, args 
 // ************************************
 // createAsset
 // ************************************
-func (t *SimpleChaincode) createAsset(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+func (t *SimpleChaincode) createAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var assetID string
 	var assetType string
 	var assetName string
@@ -402,7 +402,7 @@ func (t *SimpleChaincode) createAsset(stub *shim.ChaincodeStub, args []string) (
 // ************************************
 // updateAsset
 // ************************************
-func (t *SimpleChaincode) updateAsset(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+func (t *SimpleChaincode) updateAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var assetID string
 	var assetType string
 	var assetName string
@@ -598,7 +598,7 @@ func (t *SimpleChaincode) updateAsset(stub *shim.ChaincodeStub, args []string) (
 // ************************************
 // deleteAsset
 // ************************************
-func (t *SimpleChaincode) deleteAsset(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+func (t *SimpleChaincode) deleteAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var assetID string
 	var assetType string
 	var assetName string
@@ -700,7 +700,7 @@ func (t *SimpleChaincode) deleteAsset(stub *shim.ChaincodeStub, args []string) (
 // ************************************
 // deletePropertiesFromAsset
 // ************************************
-func (t *SimpleChaincode) deletePropertiesFromAsset(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+func (t *SimpleChaincode) deletePropertiesFromAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var assetID string
 	var assetType string
 	var assetName string
@@ -925,7 +925,7 @@ OUTERDELETELOOP:
 // ************************************
 // deletaAllAssets
 // ************************************
-func (t *SimpleChaincode) deleteAllAssets(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+func (t *SimpleChaincode) deleteAllAssets(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var sAssetKey string
 	var err error
 
@@ -978,7 +978,7 @@ func (t *SimpleChaincode) deleteAllAssets(stub *shim.ChaincodeStub, args []strin
 // ************************************
 // readAsset
 // ************************************
-func (t *SimpleChaincode) readAsset(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+func (t *SimpleChaincode) readAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var assetID string
 	var assetType string
 	var assetName string
@@ -1060,7 +1060,7 @@ func (t *SimpleChaincode) readAsset(stub *shim.ChaincodeStub, args []string) ([]
 // ************************************
 // readAllAssets
 // ************************************
-func (t *SimpleChaincode) readAllAssets(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+func (t *SimpleChaincode) readAllAssets(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var sAssetKey string
 	var err error
 	var results []interface{}
@@ -1111,7 +1111,7 @@ func (t *SimpleChaincode) readAllAssets(stub *shim.ChaincodeStub, args []string)
 // ************************************
 // readAssetHistory
 // ************************************
-func (t *SimpleChaincode) readAssetHistory(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+func (t *SimpleChaincode) readAssetHistory(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var assetBytes []byte
 	var assetID string
 	var assetType string
@@ -1219,7 +1219,7 @@ func (t *SimpleChaincode) readAssetHistory(stub *shim.ChaincodeStub, args []stri
 //***************************************************
 //***************************************************
 
-func (t *SimpleChaincode) readContractState(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+func (t *SimpleChaincode) readContractState(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
 
 	if len(args) != 0 {
@@ -1250,7 +1250,7 @@ func (t *SimpleChaincode) readContractState(stub *shim.ChaincodeStub, args []str
 // ************************************
 // readContractObjectModel
 // ************************************
-func (t *SimpleChaincode) readContractObjectModel(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+func (t *SimpleChaincode) readContractObjectModel(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var state = ContractState{MYVERSION, DEFAULTNICKNAME, make(map[string]bool)}
 
 	stateJSON, err := json.Marshal(state)
@@ -1265,7 +1265,7 @@ func (t *SimpleChaincode) readContractObjectModel(stub *shim.ChaincodeStub, args
 // ************************************
 // setLoggingLevel
 // ************************************
-func (t *SimpleChaincode) setLoggingLevel(stub *shim.ChaincodeStub, args []string) error {
+func (t *SimpleChaincode) setLoggingLevel(stub shim.ChaincodeStubInterface, args []string) error {
 	type LogLevelArg struct {
 		Level string `json:"logLevel"`
 	}
@@ -1302,7 +1302,7 @@ type CreateOnUpdate struct {
 // ************************************
 // setCreateOnUpdate
 // ************************************
-func (t *SimpleChaincode) setCreateOnUpdate(stub *shim.ChaincodeStub, args []string) error {
+func (t *SimpleChaincode) setCreateOnUpdate(stub shim.ChaincodeStubInterface, args []string) error {
 	var createOnUpdate CreateOnUpdate
 	var err error
 	if len(args) != 1 {
@@ -1326,7 +1326,7 @@ func (t *SimpleChaincode) setCreateOnUpdate(stub *shim.ChaincodeStub, args []str
 }
 
 // PUTcreateOnUpdate marshals the new setting and writes it to the ledger
-func PUTcreateOnUpdate(stub *shim.ChaincodeStub, createOnUpdate CreateOnUpdate) (err error) {
+func PUTcreateOnUpdate(stub shim.ChaincodeStubInterface, createOnUpdate CreateOnUpdate) (err error) {
 	createOnUpdateBytes, err := json.Marshal(createOnUpdate)
 	if err != nil {
 		err = errors.New("PUTcreateOnUpdate failed to marshal")
@@ -1343,7 +1343,7 @@ func PUTcreateOnUpdate(stub *shim.ChaincodeStub, createOnUpdate CreateOnUpdate) 
 }
 
 // canCreateOnUpdate retrieves the setting from the ledger and returns it to the calling function
-func canCreateOnUpdate(stub *shim.ChaincodeStub) bool {
+func canCreateOnUpdate(stub shim.ChaincodeStubInterface) bool {
 	var createOnUpdate CreateOnUpdate
 	createOnUpdateBytes, err := stub.GetState("CreateOnUpdate")
 	if err != nil {
@@ -1362,7 +1362,7 @@ func canCreateOnUpdate(stub *shim.ChaincodeStub) bool {
 // *********************************** ContractState ***************************************************************
 
 // GETContractStateFromLedger retrieves state from ledger and returns to caller
-func GETContractStateFromLedger(stub *shim.ChaincodeStub) (ContractState, error) {
+func GETContractStateFromLedger(stub shim.ChaincodeStubInterface) (ContractState, error) {
     var state = ContractState{ MYVERSION, DEFAULTNICKNAME, make(map[string]bool) }
     var err error
 	contractStateBytes, err := stub.GetState(CONTRACTSTATEKEY)
@@ -1392,7 +1392,7 @@ func GETContractStateFromLedger(stub *shim.ChaincodeStub) (ContractState, error)
 }
 
 // PUTContractStateToLedger writes a contract state into the ledger
-func PUTContractStateToLedger(stub *shim.ChaincodeStub, state ContractState) (error) {
+func PUTContractStateToLedger(stub shim.ChaincodeStubInterface, state ContractState) (error) {
     var contractStateJSON []byte
     var err error
     contractStateJSON, err = json.Marshal(state)
@@ -1411,7 +1411,7 @@ func PUTContractStateToLedger(stub *shim.ChaincodeStub, state ContractState) (er
     return nil 
 }
 
-func addAssetToContractState(stub *shim.ChaincodeStub, sAssetKey string) (error) {
+func addAssetToContractState(stub shim.ChaincodeStubInterface, sAssetKey string) (error) {
     var state ContractState
     var err error
     state, err = GETContractStateFromLedger(stub)  
@@ -1423,7 +1423,7 @@ func addAssetToContractState(stub *shim.ChaincodeStub, sAssetKey string) (error)
     return PUTContractStateToLedger(stub, state)
 }
 
-func removeAssetFromContractState(stub *shim.ChaincodeStub, assetID string) (error) {
+func removeAssetFromContractState(stub shim.ChaincodeStubInterface, assetID string) (error) {
     var state ContractState
     var err error
     state, err = GETContractStateFromLedger(stub)  
@@ -1435,7 +1435,7 @@ func removeAssetFromContractState(stub *shim.ChaincodeStub, assetID string) (err
     return PUTContractStateToLedger(stub, state)
 }
 
-func getActiveAssets(stub *shim.ChaincodeStub) ([]string, error) {
+func getActiveAssets(stub shim.ChaincodeStubInterface) ([]string, error) {
     var state ContractState
     var err error
     state, err = GETContractStateFromLedger(stub)  
@@ -1452,7 +1452,7 @@ func getActiveAssets(stub *shim.ChaincodeStub) ([]string, error) {
     return a, nil
 }
 
-func initializeContractState(stub *shim.ChaincodeStub, version string, nickname string) (error) {
+func initializeContractState(stub shim.ChaincodeStubInterface, version string, nickname string) (error) {
     var state ContractState
     var err error
     if version != MYVERSION {
@@ -1474,7 +1474,7 @@ func initializeContractState(stub *shim.ChaincodeStub, version string, nickname 
     return PUTContractStateToLedger(stub, state)
 }
 
-func getLedgerContractVersion(stub *shim.ChaincodeStub) (string, error) {
+func getLedgerContractVersion(stub shim.ChaincodeStubInterface) (string, error) {
     var state ContractState
     var err error
     state, err = GETContractStateFromLedger(stub)  
@@ -1484,7 +1484,7 @@ func getLedgerContractVersion(stub *shim.ChaincodeStub) (string, error) {
     return state.Version, nil   
 }
 
-func assetIsActive(stub *shim.ChaincodeStub, sAssetKey string) (bool) {
+func assetIsActive(stub shim.ChaincodeStubInterface, sAssetKey string) (bool) {
     var state ContractState
     var err error
     state, err = GETContractStateFromLedger(stub)
@@ -1494,7 +1494,7 @@ func assetIsActive(stub *shim.ChaincodeStub, sAssetKey string) (bool) {
 }                      
 //********************************* Recent ***************************************************
 // GETRecentStatesFromLedger returns the unmarshaled recent states
-func GETRecentStatesFromLedger(stub *shim.ChaincodeStub) (RecentStates, error) {
+func GETRecentStatesFromLedger(stub shim.ChaincodeStubInterface) (RecentStates, error) {
     var state = RecentStates{make([]string, 0, MaxRecentStates)}
     var err error
 	recentStatesBytes, err := stub.GetState(RECENTSTATESKEY)
@@ -1513,7 +1513,7 @@ func GETRecentStatesFromLedger(stub *shim.ChaincodeStub) (RecentStates, error) {
 }
 
 // PUTRecentStatesToLedger marshals and writes the recent states
-func PUTRecentStatesToLedger(stub *shim.ChaincodeStub, state RecentStates) (error) {
+func PUTRecentStatesToLedger(stub shim.ChaincodeStubInterface, state RecentStates) (error) {
     var recentStatesJSON []byte
     var err error
     recentStatesJSON, err = json.Marshal(state.RecentStates)
@@ -1530,13 +1530,13 @@ func PUTRecentStatesToLedger(stub *shim.ChaincodeStub, state RecentStates) (erro
     return nil 
 }
 
-func clearRecentStates(stub *shim.ChaincodeStub) (error) {
+func clearRecentStates(stub shim.ChaincodeStubInterface) (error) {
     var rstates RecentStates
     rstates.RecentStates = make([]string, 0, MaxRecentStates)
     return PUTRecentStatesToLedger(stub, rstates)
 }
 
-func pushRecentState (stub *shim.ChaincodeStub, state string) (error) {
+func pushRecentState (stub shim.ChaincodeStubInterface, state string) (error) {
     var rstate RecentStates
     var err error
     var assetID string
@@ -1572,7 +1572,7 @@ func pushRecentState (stub *shim.ChaincodeStub, state string) (error) {
 }
 
 // typically called when an asset is deleted
-func removeAssetFromRecentState (stub *shim.ChaincodeStub, assetID string) (error) {
+func removeAssetFromRecentState (stub shim.ChaincodeStubInterface, assetID string) (error) {
     var rstate RecentStates
     var err error
     rstate, err = GETRecentStatesFromLedger(stub)
@@ -1633,7 +1633,7 @@ func findAssetInRecent (assetID string, rstate RecentStates) (int, error) {
     return -1, nil
 }
 
-func readRecentStates(stub *shim.ChaincodeStub) ([]byte, error) {
+func readRecentStates(stub shim.ChaincodeStubInterface) ([]byte, error) {
 	var err error
     var rstate RecentStates
     var rstateOut = make([]interface{}, 0, MaxRecentStates) 
@@ -1999,7 +1999,7 @@ type AssetStateHistory struct {
 }
 
 // Create a new history entry in the ledger for an asset.,\
-func createStateHistory(stub *shim.ChaincodeStub, assetID string, stateJSON string) error {
+func createStateHistory(stub shim.ChaincodeStubInterface, assetID string, stateJSON string) error {
 
 	var ledgerKey = assetID + STATEHISTORYKEY
 	var assetStateHistory = AssetStateHistory{make([]string, 1)}
@@ -2015,7 +2015,7 @@ func createStateHistory(stub *shim.ChaincodeStub, assetID string, stateJSON stri
 }
 
 // Update the ledger with new state history for an asset. States are stored in the ledger in descending order by timestamp.
-func updateStateHistory(stub *shim.ChaincodeStub, assetID string, stateJSON string) error {
+func updateStateHistory(stub shim.ChaincodeStubInterface, assetID string, stateJSON string) error {
 
 	var ledgerKey = assetID + STATEHISTORYKEY
 	var historyBytes []byte
@@ -2046,7 +2046,7 @@ func updateStateHistory(stub *shim.ChaincodeStub, assetID string, stateJSON stri
 }
 
 // Delete an state history from the ledger.
-func deleteStateHistory(stub *shim.ChaincodeStub, assetID string) error {
+func deleteStateHistory(stub shim.ChaincodeStubInterface, assetID string) error {
 
 	var ledgerKey = assetID + STATEHISTORYKEY
 	return stub.DelState(ledgerKey)
@@ -2054,7 +2054,7 @@ func deleteStateHistory(stub *shim.ChaincodeStub, assetID string) error {
 }
 
 // Get the state history for an asset.
-func readStateHistory(stub *shim.ChaincodeStub, assetID string) (AssetStateHistory, error) {
+func readStateHistory(stub shim.ChaincodeStubInterface, assetID string) (AssetStateHistory, error) {
 
 	var ledgerKey = assetID + STATEHISTORYKEY
 	var assetStateHistory AssetStateHistory
