@@ -134,6 +134,9 @@ const ASSETTYPE string = "assettype"
 // ASSETNAME Asset description from which type is inferred
 const ASSETNAME string = "name"
 
+// ACCOUNTID is the JSON tag for the assetID
+const ACCOUNTID string = "accountID"
+
 //// ACCOUNTNAME Asset description from which type is inferred
 const ACCOUNTNAME string = "acname"
 
@@ -2432,7 +2435,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	}
 
 	// is accountID present or blank?
-	assetIDBytes, found := getObject(argsMap, accountID)
+	assetIDBytes, found := getObject(argsMap, ACCOUNTID)
 	fmt.Println("assetIDBytes",assetIDBytes)
 	
 	if found {
@@ -2582,6 +2585,7 @@ func (t *SimpleChaincode) readAllAccounts(stub shim.ChaincodeStubInterface, args
 	}
 
 	aa, err := getActiveAccounts(stub)
+	fmt.Println("aa",aa)
 	if err != nil {
 		err = fmt.Errorf("readAllAccounts failed to get the active assets: %s", err)
 		log.Error(err)
