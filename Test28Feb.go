@@ -228,6 +228,8 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		return t.readContractObjectModel(stub, args)
 	} else if function == "readContractState" {
 		return t.readContractState(stub, args)
+	} else if function == "readAllAccounts" {
+		return t.readAllAccounts(stub, args)
 	}
 	// To be added
 	/*   else if function == "readAllAssetsOfType" {
@@ -2564,5 +2566,72 @@ func addAccountToContractState(stub shim.ChaincodeStubInterface, sAssetKey strin
     log.Debugf("Adding asset %s to contract", sAssetKey)
     state.ActiveAccounts[sAssetKey] = true
     return PUTContractStateToLedger(stub, state)
+}// ************************************
+// readAllAssets
+// ************************************
+func (t *SimpleChaincode) readAllAccounts(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var sAssetKey string
+	var err error
+	var results []interface{}
+	var state interface{}
+
+	if len(args) > 0 {
+		err = errors.New("readAllAccounts expects no arguments")
+		log.Error(err)
+		return nil, err
+	}
+
+	aa, err := getActiveAccounts(stub)
+	if err != nil {
+		err = fmt.Errorf("readAllAccounts failed to get the active assets: %s", err)
+		log.Error(err)
+		return nil, err
+	}
+	results = make([]interface{}, 0, len(aa))
+	for i := range aa {
+		sAssetKey = aa[i]
+		// Get the state from the ledger
+		assetBytes, err := stub.GetState(sAssetKey)
+		if err != nil {
+			// best efforts, return what we can
+			log.Errorf("readAllAccounts assetID %s failed GETSTATE", sAssetKey)
+			continue
+		} else {
+			err = json.Unmarshal(assetBytes, &state)
+			if err != nil {
+				// best efforts, return what we can
+				log.Errorf("readAllAccounts assetID %s failed to unmarshal", sAssetKey)
+				continue
+			}
+			results = append(results, state)
+		}
+	}
+
+	resultsStr, err := json.Marshal(results)
+	if err != nil {
+		err = fmt.Errorf("readAllAccounts failed to marshal results: %s", err)
+		log.Error(err)
+		return nil, err
+	}
+
+	return []byte(resultsStr), nil
 }
+
+func getActiveAccounts(stub shim.ChaincodeStubInterface) ([]string, error) {
+    var state ContractState
+    var err error
+    state, err = GETContractStateFromLedger(stub)  
+    if err != nil {
+        return []string{}, err
+    }
+    var a = make([]string, len(state.ActiveAccounts))
+    i := 0
+    for id := range state.ActiveAccounts {
+        a[i] = id
+        i++ 
+    }
+    sort.Strings(a)
+    return a, nil
+}
+
 
