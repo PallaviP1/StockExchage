@@ -228,6 +228,8 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		return t.readContractState(stub, args)
 	} else if function == "readAllAccounts" {
 		return t.readAllAccounts(stub, args)
+	}	else if function == "readAllIssue" {
+		return t.readAllIssue(stub, args)
 	}
 	// To be added
 	/*   else if function == "readAllAssetsOfType" {
