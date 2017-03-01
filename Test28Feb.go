@@ -2365,7 +2365,7 @@ func (alerts *AlertStatusInternal) calculateContractCompliance (a *ArgsMap) (boo
 // ************************************
 func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var accountID string
-	
+	var assetType string
 	var accountName string
 	var argsMap ArgsMap
 	var event interface{}
@@ -2388,7 +2388,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	accountName = ""
 	eventBytes := []byte(args[0])
 	log.Debugf("createAccount arg: %s", args[0])
-
+	fmt.Println("args[0]",args[0])
 	err = json.Unmarshal(eventBytes, &event)
 	if err != nil {
 		log.Errorf("createAccount failed to unmarshal arg: %s", err)
@@ -2410,6 +2410,8 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 
 	// is accountID present or blank?
 	assetIDBytes, found := getObject(argsMap, accountID)
+	fmt.Println("assetIDBytes",assetIDBytes)
+	
 	if found {
 		accountID, found = assetIDBytes.(string)
 		if !found || accountID == "" {
@@ -2430,8 +2432,9 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	}
 
 
-	
-	sAccountKey := accountID 
+    assetType="account"
+	sAccountKey := accountID + "_" + assetType
+	fmt.Println("sAccountKey",sAccountKey)
 	found = accountIsActive(stub, sAccountKey)
 	if found {
 		err := fmt.Errorf("createAsset arg asset %s already exists", accountID)
