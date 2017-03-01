@@ -203,6 +203,8 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return nil, t.setCreateOnUpdate(stub, args)
 	}else if function == "createAccount" {
 		return  t.createAccount(stub, args)
+	}else if function == "issueAsset" {
+		return t.issueAsset(stub, args)
 	}
 	err := fmt.Errorf("Invoke received unknown invocation: %s", function)
 	log.Warning(err)
