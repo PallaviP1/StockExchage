@@ -14,14 +14,6 @@ import (
 
 )
 
-// For now, We will not use go generate here : go:generate go run scripts/generate_go_schema.go
-// This is because there are different assets of various structures coming in. The only
-// certainity is that the assets should have an asset id and asset type. These will be extracted
-// and the asset data stored and manipulated as such
-// Alerts have been temporarily written in a manner that they will run only for applicable types -
-// essentially based on whether the observed values are in the incoming data stream
-// This needs to be modified as well.
-// Major revamp required to the approach based on the use case.
 
 //***************************************************
 const MYVERSION string = "1.0"
@@ -2451,7 +2443,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	if found {
 		accountName, found = assetTypeBytes.(string)
 		if !found || accountName == "" {
-			err := errors.New("createAsset arg does not include accountName ")
+			err := errors.New("createAccout arg does not include accountName ")
 			log.Error(err)
 			return nil, err
 		}
@@ -2462,7 +2454,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	fmt.Println("sAccountKey",sAccountKey)
 	found = accountIsActive(stub, sAccountKey)
 	if found {
-		err := fmt.Errorf("createAsset arg asset %s already exists", accountID)
+		err := fmt.Errorf("createAccout arg asset %s already exists", accountID)
 		log.Error(err)
 		return nil, err
 	}
@@ -2475,7 +2467,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	alerts := newAlertStatus()
 	if argsMap.executeRules(&alerts) {
 		// NOT compliant!
-		log.Noticef("createAsset accountID %s is noncompliant", accountID)
+		log.Noticef("createAccout accountID %s is noncompliant", accountID)
 		argsMap["alerts"] = alerts
 		delete(argsMap, "incompliance")
 	} else {
@@ -2635,6 +2627,167 @@ func getActiveAccounts(stub shim.ChaincodeStubInterface) ([]string, error) {
     }
     sort.Strings(a)
     return a, nil
+}
+
+//******************************************************************************Issue************************************
+
+func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var accountID string
+	var assetID string
+	var amount int
+	var argsMap ArgsMap
+	var event interface{}
+	var found bool
+	var err error
+	//var timeIn time.Time
+
+	log.Info("Entering createAsset")
+
+	// allowing 2 args because updateAsset is allowed to redirect when
+	// asset does not exist
+	if len(args) < 1 || len(args) > 2 {
+		err = errors.New("Expecting one JSON event object")
+		log.Error(err)
+		return nil, err
+	}
+
+	accountID = ""
+	amount = 0
+	eventBytes := []byte(args[0])
+	log.Debugf("createAccount arg: %s", args[0])
+	fmt.Println("args[0]",args[0])
+	err = json.Unmarshal(eventBytes, &event)
+	if err != nil {
+		log.Errorf("createAccount failed to unmarshal arg: %s", err)
+		return nil, err
+	}
+
+	if event == nil {
+		err = errors.New("createAccount unmarshal arg created nil event")
+		log.Error(err)
+		return nil, err
+	}
+
+	argsMap, found = event.(map[string]interface{})
+	if !found {
+		err := errors.New("createAccount arg is not a map shape")
+		log.Error(err)
+		return nil, err
+	}
+
+/*	// is accountID present or blank?
+	assetIDBytes, found := getObject(argsMap, ACCOUNTID)
+	fmt.Println("assetIDBytes",assetIDBytes)
+	
+	if found {
+		accountID, found = assetIDBytes.(string)
+		if !found || accountID == "" {
+			err := errors.New("createAccount arg does not include accountID ")
+			log.Error(err)
+			return nil, err
+		}
+	}
+	// Is asset name present?
+	assetTypeBytes, found := getObject(argsMap, ACCOUNTNAME)
+	if found {
+		accountName, found = assetTypeBytes.(string)
+		if !found || accountName == "" {
+			err := errors.New("createAsset arg does not include accountName ")
+			log.Error(err)
+			return nil, err
+		}
+	}*/
+
+
+	sAccountKey := accountID + "_" + assetID
+	fmt.Println("sAccountKey",sAccountKey)
+	found = accountIsActive(stub, sAccountKey)
+	if found {
+		err := fmt.Errorf("createAsset arg asset %s already exists", accountID)
+		log.Error(err)
+		return nil, err
+	}
+
+	// For now, timestamp is being sent in from the invocation to the contract
+	// Once the BlueMix instance supports GetTxnTimestamp, we will incorporate the
+	// changes to the contract
+
+	/*// run the rules and raise or clear alerts
+	alerts := newAlertStatus()
+	if argsMap.executeRules(&alerts) {
+		// NOT compliant!
+		log.Noticef("createAsset accountID %s is noncompliant", accountID)
+		argsMap["alerts"] = alerts
+		delete(argsMap, "incompliance")
+	} else {
+		if alerts.AllClear() {
+			// all false, no need to appear
+			delete(argsMap, "alerts")
+		} else {
+			argsMap["alerts"] = alerts
+		}
+		argsMap["incompliance"] = true
+	}*/
+
+	// copy incoming event to outgoing state
+	// this contract respects the fact that createAsset can accept a partial state
+	// as the moral equivalent of one or more discrete events
+	// further: this contract understands that its schema has two discrete objects
+	// that are meant to be used to send events: common, and custom
+	stateOut := argsMap
+
+	// save the original event
+	stateOut["lastEvent"] = make(map[string]interface{})
+	//stateOut["lastEvent"].(map[string]interface{})["function"] = "issueAsset"
+	//stateOut["lastEvent"].(map[string]interface{})["args"] = args[0]
+	if len(args) == 2 {
+		// in-band protocol for redirect
+		stateOut["lastEvent"].(map[string]interface{})["redirectedFromFunction"] = args[1]
+	}
+
+	// marshal to JSON and write
+	stateJSON, err := json.Marshal(&stateOut)
+	if err != nil {
+		err := fmt.Errorf("createAccount state for accountID %s failed to marshal", accountID)
+		log.Error(err)
+		return nil, err
+	}
+
+	// finally, put the new state
+	log.Infof("Putting new account state %s to ledger", string(stateJSON))
+	// The key i 'assetid'_'type'
+
+	err = stub.PutState(sAccountKey, []byte(stateJSON))
+	if err != nil {
+		err = fmt.Errorf("createAccount accountID %s PUTSTATE failed: %s", accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+	log.Infof("createAccount accountID  state %s successfully written to ledger: %s", accountID,  string(stateJSON))
+
+/*	// add asset to contract state
+	err = addAccountToContractState(stub, sAccountKey)
+	if err != nil {
+		err := fmt.Errorf("createAccount asset %s  failed to write asset state: %s", accountID,  err)
+		log.Critical(err)
+		return nil, err
+	}
+     fmt.Println("stateJSON",stateJSON)
+	err = pushRecentState(stub, string(stateJSON),"1")
+	if err != nil {
+		err = fmt.Errorf("createAccount accountID %s  push to recentstates failed: %s", accountID,  err)
+		log.Error(err)
+		return nil, err
+	}
+
+	// save state history
+	err = createStateHistory(stub, sAccountKey, string(stateJSON))
+	if err != nil {
+		err := fmt.Errorf("createAccount asset %s of type %s state history save failed: %s", accountID, sAccountKey, err)
+		log.Critical(err)
+		return nil, err
+	}*/
+	return nil, nil
 }
 
 
