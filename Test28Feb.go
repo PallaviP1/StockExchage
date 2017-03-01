@@ -1610,10 +1610,10 @@ func removeAssetFromRecentState (stub shim.ChaincodeStubInterface, assetID strin
 }
 
 func getAssetIDFromState(state string,isAsset string) (string, error) {
-   
+
 	var err error
 	if isAsset == "0" {
-	 var substate AssetIDT
+	     	var substate AssetIDT
     err = json.Unmarshal([]byte(state), &substate)
     if err != nil {
         log.Errorf("getAssetIDFromState state unmarshal to AssetID failed: %s", err)
@@ -1624,9 +1624,9 @@ func getAssetIDFromState(state string,isAsset string) (string, error) {
         log.Error(err)
         return "", err
     }
-    
+    	return substate.ID, nil 
 	}else if isAsset == "1"	{ 
-	var substate AccountIDT
+      	var substate AccountIDT
 	
 	err = json.Unmarshal([]byte(state), &substate)
     if err != nil {
@@ -1638,9 +1638,9 @@ func getAssetIDFromState(state string,isAsset string) (string, error) {
         log.Error(err)
         return "", err
     }
-   
+   	return substate.ID, nil 
 	}
-	return substate.ID, nil 
+   	return "blank", nil 
 }
 
 func findAssetInRecent (assetID string, rstate RecentStates) (int, error) {
