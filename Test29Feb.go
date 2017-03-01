@@ -2859,7 +2859,7 @@ func (t *SimpleChaincode) readAllIssue(stub shim.ChaincodeStubInterface, args []
 		return nil, err
 	}
 
-	aa, err := getActiveAccounts(stub)
+	aa, err := getissueActiveAccounts(stub)
 	fmt.Println("aa",aa)
 	if err != nil {
 		err = fmt.Errorf("readAllAccounts failed to get the active assets: %s", err)
@@ -2903,4 +2903,21 @@ func issueAccountIsActive(stub shim.ChaincodeStubInterface, sAssetKey string) (b
     if err != nil { return false}
     found, _ := state.IssueAccounts[sAssetKey]
     return found
+}
+
+func getissueActiveAccounts(stub shim.ChaincodeStubInterface) ([]string, error) {
+    var state ContractState
+    var err error
+    state, err = GETContractStateFromLedger(stub)  
+    if err != nil {
+        return []string{}, err
+    }
+    var a = make([]string, len(state.ActiveAccounts))
+    i := 0
+    for id := range state.IssueAccounts {
+        a[i] = id
+        i++ 
+    }
+    sort.Strings(a)
+    return a, nil
 }
