@@ -2634,7 +2634,7 @@ func getActiveAccounts(stub shim.ChaincodeStubInterface) ([]string, error) {
 func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var accountID string
 	var assetID string
-	var amount int
+//	var amount int
 	var argsMap ArgsMap
 	var event interface{}
 	var found bool
@@ -2652,7 +2652,7 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 	}
 
 	accountID = ""
-	amount = 0
+//	amount = 0
 	eventBytes := []byte(args[0])
 	log.Debugf("createAccount arg: %s", args[0])
 	fmt.Println("args[0]",args[0])
