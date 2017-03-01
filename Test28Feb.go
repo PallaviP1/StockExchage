@@ -55,7 +55,10 @@ type RecentStates struct {
 type AssetIDT struct {
     ID string `json:"assetID"`
 } 
-
+// AccountIDT is accountID as type, used for simple unmarshaling
+type AccountIDT struct {
+    ID string `json:"accountID"`
+} 
 // MaxRecentStates is an arbitrary limit on how many asset states we track across the 
 // entire contract
 const MaxRecentStates int = 20
@@ -388,7 +391,7 @@ func (t *SimpleChaincode) createAsset(stub shim.ChaincodeStubInterface, args []s
 		return nil, err
 	}
 
-	err = pushRecentState(stub, string(stateJSON))
+	err = pushRecentState(stub, string(stateJSON),"0")
 	if err != nil {
 		err = fmt.Errorf("createAsset AssetID %s of type %s push to recentstates failed: %s", assetID, assetType, err)
 		log.Error(err)
@@ -581,7 +584,7 @@ func (t *SimpleChaincode) updateAsset(stub shim.ChaincodeStubInterface, args []s
 		log.Error(err)
 		return nil, err
 	}
-	err = pushRecentState(stub, string(stateJSON))
+	err = pushRecentState(stub, string(stateJSON),"0")
 	if err != nil {
 		err = fmt.Errorf("updateAsset AssetID %s push to recentstates failed: %s", assetID, err)
 		log.Error(err)
@@ -910,7 +913,7 @@ OUTERDELETELOOP:
 		log.Error(err)
 		return nil, err
 	}
-	err = pushRecentState(stub, string(stateJSON))
+	err = pushRecentState(stub, string(stateJSON),"0")
 	if err != nil {
 		err = fmt.Errorf("deletePropertiesFromAsset AssetID %s of type %s push to recentstates failed: %s", assetID, assetType, err)
 		log.Error(err)
@@ -1545,12 +1548,12 @@ func clearRecentStates(stub shim.ChaincodeStubInterface) (error) {
     return PUTRecentStatesToLedger(stub, rstates)
 }
 
-func pushRecentState (stub shim.ChaincodeStubInterface, state string) (error) {
+func pushRecentState (stub shim.ChaincodeStubInterface, state string,isAsset string) (error) {
     var rstate RecentStates
     var err error
     var assetID string
     
-    assetID, err = getAssetIDFromState(state)
+    assetID, err = getAssetIDFromState(state,isAsset)
     if err != nil {
         return err
     }
@@ -1606,9 +1609,11 @@ func removeAssetFromRecentState (stub shim.ChaincodeStubInterface, assetID strin
     return PUTRecentStatesToLedger(stub, rstate)
 }
 
-func getAssetIDFromState(state string) (string, error) {
-    var substate AssetIDT
-    var err error
+func getAssetIDFromState(state string,isAsset string) (string, error) {
+   
+	var err error
+	if isAsset == "0" {
+	 var substate AssetIDT
     err = json.Unmarshal([]byte(state), &substate)
     if err != nil {
         log.Errorf("getAssetIDFromState state unmarshal to AssetID failed: %s", err)
@@ -1619,7 +1624,23 @@ func getAssetIDFromState(state string) (string, error) {
         log.Error(err)
         return "", err
     }
-    return substate.ID, nil 
+    
+	}else if isAsset == "1"	{ 
+	var substate AccountIDT
+	
+	err = json.Unmarshal([]byte(state), &substate)
+    if err != nil {
+        log.Errorf("getAssetIDFromState state unmarshal to AssetID failed: %s", err)
+        return "", err
+    }
+    if len(substate.ID) == 0 {
+        err = errors.New("getAssetIDFromState substate.common.assetID is blank")
+        log.Error(err)
+        return "", err
+    }
+   
+	}
+	return substate.ID, nil 
 }
 
 func findAssetInRecent (assetID string, rstate RecentStates) (int, error) {
@@ -2506,8 +2527,8 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 		log.Critical(err)
 		return nil, err
 	}
-
-	err = pushRecentState(stub, string(stateJSON))
+fmt.Println("stateJSON",stateJSON)
+	err = pushRecentState(stub, string(stateJSON),"1")
 	if err != nil {
 		err = fmt.Errorf("createAccount accountID %s  push to recentstates failed: %s", accountID,  err)
 		log.Error(err)
@@ -2544,3 +2565,4 @@ func addAccountToContractState(stub shim.ChaincodeStubInterface, sAssetKey strin
     state.ActiveAccounts[sAssetKey] = true
     return PUTContractStateToLedger(stub, state)
 }
+
