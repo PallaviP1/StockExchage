@@ -33,6 +33,7 @@ type ContractState struct {
     Nickname     string           `json:"nickname"`
 	ActiveAssets map[string]bool  `json:"activeAssets"`
 	ActiveAccounts map[string]bool  `json:"activeAccounts"`
+	IssueAccounts map[string]bool  `json:"IssueAccounts"`
 }
 //*************************************************** Recent 
 // RECENTSTATESKEY is used as key for recent states bucket
@@ -1259,7 +1260,7 @@ func (t *SimpleChaincode) readContractState(stub shim.ChaincodeStubInterface, ar
 // readContractObjectModel
 // ************************************
 func (t *SimpleChaincode) readContractObjectModel(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	var state = ContractState{MYVERSION, DEFAULTNICKNAME, make(map[string]bool),make(map[string]bool)}
+	var state = ContractState{MYVERSION, DEFAULTNICKNAME, make(map[string]bool),make(map[string]bool),make(map[string]bool)}
 
 	stateJSON, err := json.Marshal(state)
 	if err != nil {
@@ -1371,7 +1372,7 @@ func canCreateOnUpdate(stub shim.ChaincodeStubInterface) bool {
 
 // GETContractStateFromLedger retrieves state from ledger and returns to caller
 func GETContractStateFromLedger(stub shim.ChaincodeStubInterface) (ContractState, error) {
-    var state = ContractState{ MYVERSION, DEFAULTNICKNAME, make(map[string]bool),make(map[string]bool) }
+    var state = ContractState{ MYVERSION, DEFAULTNICKNAME, make(map[string]bool),make(map[string]bool),make(map[string]bool) }
     var err error
 	contractStateBytes, err := stub.GetState(CONTRACTSTATEKEY)
     // minimum string is {"version":""} and version cannot be empty 
@@ -2519,7 +2520,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	log.Infof("createAccount accountID  state %s successfully written to ledger: %s", accountID,  string(stateJSON))
 
 	// add asset to contract state
-	err = addAccountToContractState(stub, sAccountKey)
+	err = addAccountToContractState(stub, sAccountKey,"account")
 	if err != nil {
 		err := fmt.Errorf("createAccount asset %s  failed to write asset state: %s", accountID,  err)
 		log.Critical(err)
@@ -2552,7 +2553,7 @@ func accountIsActive(stub shim.ChaincodeStubInterface, sAssetKey string) (bool) 
     return found
 }
 
-func addAccountToContractState(stub shim.ChaincodeStubInterface, sAssetKey string) (error) {
+func addAccountToContractState(stub shim.ChaincodeStubInterface, sAssetKey string,transType string) (error) {
     var state ContractState
     var err error
     state, err = GETContractStateFromLedger(stub)  
@@ -2560,7 +2561,11 @@ func addAccountToContractState(stub shim.ChaincodeStubInterface, sAssetKey strin
         return err
     }
     log.Debugf("Adding asset %s to contract", sAssetKey)
+	if transType == "account"{
     state.ActiveAccounts[sAssetKey] = true
+	}else if(transType== "issue"){
+		 state.IssueAccounts[sAssetKey] = true
+	}
     return PUTContractStateToLedger(stub, state)
 }// ************************************
 // readAllAssets
@@ -2639,6 +2644,8 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 //	var amount int
 	var argsMap ArgsMap
 	var event interface{}
+	var ledgerMap ArgsMap
+	var ledgerBytes interface{}
 	var found bool
 	var err error
 	//var timeIn time.Time
@@ -2703,11 +2710,58 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 
 	sAccountKey := accountID + "_" + assetID
 	fmt.Println("sAccountKey",sAccountKey)
-	found = accountIsActive(stub, sAccountKey)
+	found = issueAccountIsActive(stub, sAccountKey)
 	if found {
-		err := fmt.Errorf("createAsset arg asset %s already exists", accountID)
+	/*	err := fmt.Errorf("createAsset arg asset %s already exists", accountID)
+		log.Error(err)
+		return nil, err*/
+		assetBytes, err := stub.GetState(sAccountKey)
+	if err != nil {
+		log.Errorf("updateAsset assetID %s of type %s GETSTATE failed: %s", assetID, accountID, err)
+		return nil, err
+	}
+
+	// unmarshal the existing state from the ledger to theinterface
+	err = json.Unmarshal(assetBytes, &ledgerBytes)
+	if err != nil {
+		log.Errorf("updateAsset assetID %s of type %s unmarshal failed: %s", assetID, accountID, err)
+		return nil, err
+	}
+
+	// assert the existing state as a map
+	ledgerMap, found = ledgerBytes.(map[string]interface{})
+	if !found {
+		log.Errorf("updateAsset assetID %s of type %s LEDGER state is not a map shape", assetID, accountID)
+		return nil, err
+	}
+
+
+	stateOut := deepMerge(map[string]interface{}(argsMap),
+		map[string]interface{}(ledgerMap))
+	log.Debugf("updateAsset assetID %s merged state: %s of type %s", assetID, accountID, stateOut)
+
+	// save the original event
+	stateOut["lastEvent"] = make(map[string]interface{})
+	
+
+	// Write the new state to the ledger
+	stateJSON, err := json.Marshal(ledgerMap)
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s marshal failed: %s", assetID, accountID, err)
 		log.Error(err)
 		return nil, err
+	}
+
+	// finally, put the new state
+	err = stub.PutState(sAccountKey, []byte(stateJSON))
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s PUTSTATE failed: %s", assetID, accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+
+	return nil, nil
+
 	}
 
 	// For now, timestamp is being sent in from the invocation to the contract
@@ -2767,15 +2821,15 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 	}
 	log.Infof("createAccount accountID  state %s successfully written to ledger: %s", accountID,  string(stateJSON))
 
-/*	// add asset to contract state
-	err = addAccountToContractState(stub, sAccountKey)
+	// add asset to contract state
+	err = addAccountToContractState(stub, sAccountKey,"issue")
 	if err != nil {
 		err := fmt.Errorf("createAccount asset %s  failed to write asset state: %s", accountID,  err)
 		log.Critical(err)
 		return nil, err
 	}
      fmt.Println("stateJSON",stateJSON)
-	err = pushRecentState(stub, string(stateJSON),"1")
+/*	err = pushRecentState(stub, string(stateJSON),"1")
 	if err != nil {
 		err = fmt.Errorf("createAccount accountID %s  push to recentstates failed: %s", accountID,  err)
 		log.Error(err)
@@ -2792,4 +2846,61 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 	return nil, nil
 }
 
+//******************************************ReadIssue****************************
+func (t *SimpleChaincode) readAllIssue(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var sAssetKey string
+	var err error
+	var results []interface{}
+	var state interface{}
 
+	if len(args) > 0 {
+		err = errors.New("readAllAccounts expects no arguments")
+		log.Error(err)
+		return nil, err
+	}
+
+	aa, err := getActiveAccounts(stub)
+	fmt.Println("aa",aa)
+	if err != nil {
+		err = fmt.Errorf("readAllAccounts failed to get the active assets: %s", err)
+		log.Error(err)
+		return nil, err
+	}
+	results = make([]interface{}, 0, len(aa))
+	for i := range aa {
+		sAssetKey = aa[i]
+		// Get the state from the ledger
+		assetBytes, err := stub.GetState(sAssetKey)
+		if err != nil {
+			// best efforts, return what we can
+			log.Errorf("readAllAccounts assetID %s failed GETSTATE", sAssetKey)
+			continue
+		} else {
+			err = json.Unmarshal(assetBytes, &state)
+			if err != nil {
+				// best efforts, return what we can
+				log.Errorf("readAllAccounts assetID %s failed to unmarshal", sAssetKey)
+				continue
+			}
+			results = append(results, state)
+		}
+	}
+
+	resultsStr, err := json.Marshal(results)
+	if err != nil {
+		err = fmt.Errorf("readAllAccounts failed to marshal results: %s", err)
+		log.Error(err)
+		return nil, err
+	}
+
+	return []byte(resultsStr), nil
+}
+
+func issueAccountIsActive(stub shim.ChaincodeStubInterface, sAssetKey string) (bool) {
+    var state ContractState
+    var err error
+    state, err = GETContractStateFromLedger(stub)
+    if err != nil { return false}
+    found, _ := state.IssueAccounts[sAssetKey]
+    return found
+}
