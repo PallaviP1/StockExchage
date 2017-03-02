@@ -3069,7 +3069,7 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 		return nil, err
 	}
 	
-fmt.Println("argsMap[amount] :",argsMap["amount"]) 
+//fmt.Println("argsMap[amount] :",argsMap["amount"]) 
 /*var sum1 int
 var sum2 int
 var sum int
