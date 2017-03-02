@@ -1861,6 +1861,7 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
                 dstKey, found := findMatchingKey(dst, k)
                 if found {
                     dstChild, found := dst[dstKey].(map[string]interface{})
+					fmt.Println("dstchild :",dstChild)
                     if found {
                         // recursive deepMerge into existing key
                         dst[dstKey] = deepMerge(v.(map[string]interface{}), dstChild)
@@ -1894,6 +1895,7 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
                     dst[k] = v
                 }
         }
+		fmt.Println("v:",v)
     }
     return dst
 }
@@ -3044,6 +3046,7 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 	/*	err := fmt.Errorf("createAsset arg asset %s already exists", accountID)
 		log.Error(err)
 		return nil, err*/
+		fmt.Println("found")
 		assetBytes, err := stub.GetState(sAccountKey)
 		fmt.Println("assetBytes",assetBytes)
 	if err != nil {
@@ -3076,7 +3079,7 @@ fmt.Println("Sum1 :",sum1)
 fmt.Println("Sum2 :",sum2)
 sum=sum1+sum2
 */
- ledgerMap["amount"] = 90
+ //ledgerMap["amount"] = 90
 
 //fmt.Println("Sum :",sum)
 fmt.Println("ledgerMap :",ledgerMap["amount"])
@@ -3122,12 +3125,12 @@ fmt.Println("ledgerMap :",ledgerMap["amount"])
 	return nil, nil
 
 	}
-
+//****************************************
 	stateOut := argsMap
 
 	// save the original event
 	stateOut["lastEvent"] = make(map[string]interface{})
-	//stateOut["lastEvent"].(map[string]interface{})["function"] = "issueAsset"
+	stateOut["lastEvent"].(map[string]interface{})["function"] = "transferAsset"
 	//stateOut["lastEvent"].(map[string]interface{})["args"] = args[0]
 	if len(args) == 2 {
 		// in-band protocol for redirect
