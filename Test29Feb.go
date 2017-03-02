@@ -2705,7 +2705,7 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 		return nil, err
 	}
 
-/*	// is accountID present or blank?
+	// is accountID present or blank?
 	assetIDBytes, found := getObject(argsMap, ACCOUNTID)
 	fmt.Println("assetIDBytes",assetIDBytes)
 	
@@ -2718,15 +2718,15 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 		}
 	}
 	// Is asset name present?
-	assetTypeBytes, found := getObject(argsMap, ACCOUNTNAME)
+	assetTypeBytes, found := getObject(argsMap, ASSETID)
 	if found {
-		accountName, found = assetTypeBytes.(string)
-		if !found || accountName == "" {
+		assetID, found = assetTypeBytes.(string)
+		if !found || assetID == "" {
 			err := errors.New("createAsset arg does not include accountName ")
 			log.Error(err)
 			return nil, err
 		}
-	}*/
+	}
 
 
 	sAccountKey := accountID + "_" + assetID
@@ -2955,5 +2955,6 @@ func getissueActiveAccounts(stub shim.ChaincodeStubInterface) ([]string, error) 
         i++ 
     }
     sort.Strings(a)
+	fmt.Println("a:",a)
     return a, nil
 }
