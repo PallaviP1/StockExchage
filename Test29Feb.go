@@ -2948,7 +2948,7 @@ func getissueActiveAccounts(stub shim.ChaincodeStubInterface) ([]string, error) 
     if err != nil {
         return []string{}, err
     }
-    var a = make([]string, len(state.ActiveAccounts))
+    var a = make([]string, len(state.IssueAccounts))
     i := 0
     for id := range state.IssueAccounts {
         a[i] = id
