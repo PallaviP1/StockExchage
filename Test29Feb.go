@@ -3066,12 +3066,14 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 		return nil, err
 	}
 	
-fmt.Println("argsMap :",argsMap["amount"]) 
+fmt.Println("argsMap[amount] :",argsMap["amount"]) 
 var sum1 int
 var sum2 int
 var sum int
-sum1= argsMap["amount"].(int)
-sum2= ledgerMap["amount"].(int)
+sum1 = argsMap["amount"].(int)
+sum2 = ledgerMap["amount"].(int)
+fmt.Println("Sum1 :",sum1)
+fmt.Println("Sum2 :",sum2)
 sum=sum1+sum2
  ledgerMap["amount"] = sum
 
