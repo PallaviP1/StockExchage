@@ -3040,12 +3040,10 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 
 
 	sAccountKey := accountID + "_" + assetID
-	fmt.Println("sAccountKey",sAccountKey)
+	fmt.Println("sAccountKey:", sAccountKey)
 	found = issueAccountIsActive(stub, sAccountKey)
 	if found {
-	/*	err := fmt.Errorf("createAsset arg asset %s already exists", accountID)
-		log.Error(err)
-		return nil, err*/
+	
 		fmt.Println("found")
 		assetBytes, err := stub.GetState(sAccountKey)
 		fmt.Println("assetBytes",assetBytes)
@@ -3069,19 +3067,6 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 		return nil, err
 	}
 	
-//fmt.Println("argsMap[amount] :",argsMap["amount"]) 
-/*var sum1 int
-var sum2 int
-var sum int
-sum1 = argsMap["amount"]
-sum2 = ledgerMap["amount"]
-fmt.Println("Sum1 :",sum1)
-fmt.Println("Sum2 :",sum2)
-sum=sum1+sum2
-*/
- //ledgerMap["amount"] = 90
-
-//fmt.Println("Sum :",sum)
 fmt.Println("ledgerMap :",ledgerMap["amount"])
 	stateOut := deepMerge(map[string]interface{}(argsMap),
 		map[string]interface{}(ledgerMap))
