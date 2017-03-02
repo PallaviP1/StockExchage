@@ -52,6 +52,10 @@ type AssetIDT struct {
 type AccountIDT struct {
     ID string `json:"accountID"`
 } 
+
+type IssueIDT struct {
+    ID string `json:"accountID"`
+} 
 // MaxRecentStates is an arbitrary limit on how many asset states we track across the 
 // entire contract
 const MaxRecentStates int = 20
@@ -1641,6 +1645,20 @@ func getAssetIDFromState(state string,isAsset string) (string, error) {
         return "", err
     }
    	return substate.ID, nil 
+	}else if isAsset == "2"	{ 
+      	var substate IssueIDT
+	
+	err = json.Unmarshal([]byte(state), &substate)
+    if err != nil {
+        log.Errorf("getAssetIDFromState state unmarshal to AssetID failed: %s", err)
+        return "", err
+    }
+    if len(substate.ID) == 0 {
+        err = errors.New("accountID is blank")
+        log.Error(err)
+        return "", err
+    }
+   	return substate.ID, nil 
 	}
    	return "blank", nil 
 }
@@ -2680,6 +2698,7 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 	}
 
 	argsMap, found = event.(map[string]interface{})
+	fmt.Println("argsMap",argsMap)
 	if !found {
 		err := errors.New("createAccount arg is not a map shape")
 		log.Error(err)
@@ -2762,6 +2781,21 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 		return nil, err
 	}
 
+	err = pushRecentState(stub, string(stateJSON),"2")
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s push to recentstates failed: %s", assetID, err)
+		log.Error(err)
+		return nil, err
+	}
+
+	// add history state
+	err = updateStateHistory(stub, sAccountKey, string(stateJSON))
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s push to history failed: %s", assetID, accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+
 	return nil, nil
 
 	}
@@ -2831,7 +2865,7 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 		return nil, err
 	}
      fmt.Println("stateJSON",stateJSON)
-/*	err = pushRecentState(stub, string(stateJSON),"1")
+	err = pushRecentState(stub, string(stateJSON),"2")
 	if err != nil {
 		err = fmt.Errorf("createAccount accountID %s  push to recentstates failed: %s", accountID,  err)
 		log.Error(err)
@@ -2844,7 +2878,7 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 		err := fmt.Errorf("createAccount asset %s of type %s state history save failed: %s", accountID, sAccountKey, err)
 		log.Critical(err)
 		return nil, err
-	}*/
+	}
 	return nil, nil
 }
 
