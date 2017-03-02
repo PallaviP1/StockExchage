@@ -3065,9 +3065,17 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 		log.Errorf("updateAsset assetID %s of type %s LEDGER state is not a map shape", assetID, accountID)
 		return nil, err
 	}
-	 
- 
+	
+fmt.Println("argsMap :",argsMap["amount"]) 
+var sum1 int
+var sum2 int
+var sum int
+sum1= argsMap["amount"].(int)
+sum2= ledgerMap["amount"].(int)
+sum=sum1+sum2
+ ledgerMap["amount"] = sum
 
+fmt.Println("Sum :",sum)
 fmt.Println("ledgerMap :",ledgerMap["amount"])
 	stateOut := deepMerge(map[string]interface{}(argsMap),
 		map[string]interface{}(ledgerMap))
