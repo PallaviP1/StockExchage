@@ -210,7 +210,10 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return  t.createAccount(stub, args)
 	}else if function == "issueAsset" {
 		return t.issueAsset(stub, args)
+	}else if function == "transferAsset" {
+		return t.transferAsset(stub, args)
 	}
+	
 	err := fmt.Errorf("Invoke received unknown invocation: %s", function)
 	log.Warning(err)
 	return nil, err
@@ -2957,4 +2960,206 @@ func getissueActiveAccounts(stub shim.ChaincodeStubInterface) ([]string, error) 
     sort.Strings(a)
 	fmt.Println("a:",a)
     return a, nil
+}
+
+//*****************************************************************Transfer******************************************
+
+func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var accountID string
+
+	var assetID string
+//	var amount int
+	var argsMap ArgsMap
+	var event interface{}
+	var ledgerMap ArgsMap
+	var ledgerBytes interface{}
+	var found bool
+	var err error
+	//var timeIn time.Time
+
+	log.Info("Entering createAsset")
+
+	// allowing 2 args because updateAsset is allowed to redirect when
+	// asset does not exist
+	if len(args) < 1 || len(args) > 2 {
+		err = errors.New("Expecting one JSON event object")
+		log.Error(err)
+		return nil, err
+	}
+
+	accountID = ""
+//	amount = 0
+	eventBytes := []byte(args[0])
+	log.Debugf("createAccount arg: %s", args[0])
+	fmt.Println("args[0]",args[0])
+	err = json.Unmarshal(eventBytes, &event)
+	if err != nil {
+		log.Errorf("createAccount failed to unmarshal arg: %s", err)
+		return nil, err
+	}
+
+	if event == nil {
+		err = errors.New("createAccount unmarshal arg created nil event")
+		log.Error(err)
+		return nil, err
+	}
+
+	argsMap, found = event.(map[string]interface{})
+	fmt.Println("argsMap",argsMap)
+	if !found {
+		err := errors.New("createAccount arg is not a map shape")
+		log.Error(err)
+		return nil, err
+	}
+
+	// is accountID present or blank?
+	assetIDBytes, found := getObject(argsMap, ACCOUNTID)
+	fmt.Println("assetIDBytes",assetIDBytes)
+	
+	if found {
+		accountID, found = assetIDBytes.(string)
+		if !found || accountID == "" {
+			err := errors.New("createAccount arg does not include accountID ")
+			log.Error(err)
+			return nil, err
+		}
+	}
+	// Is asset name present?
+	assetTypeBytes, found := getObject(argsMap, ASSETID)
+	if found {
+		assetID, found = assetTypeBytes.(string)
+		if !found || assetID == "" {
+			err := errors.New("createAsset arg does not include accountName ")
+			log.Error(err)
+			return nil, err
+		}
+	}
+
+
+	sAccountKey := accountID + "_" + assetID
+	fmt.Println("sAccountKey",sAccountKey)
+	found = issueAccountIsActive(stub, sAccountKey)
+	if found {
+	/*	err := fmt.Errorf("createAsset arg asset %s already exists", accountID)
+		log.Error(err)
+		return nil, err*/
+		assetBytes, err := stub.GetState(sAccountKey)
+		fmt.Println("assetBytes",assetBytes)
+	if err != nil {
+		log.Errorf("updateAsset assetID %s of type %s GETSTATE failed: %s", assetID, accountID, err)
+		return nil, err
+	}
+
+	// unmarshal the existing state from the ledger to theinterface
+	err = json.Unmarshal(assetBytes, &ledgerBytes)
+	if err != nil {
+		log.Errorf("updateAsset assetID %s of type %s unmarshal failed: %s", assetID, accountID, err)
+		return nil, err
+	}
+
+	// assert the existing state as a map
+	ledgerMap, found = ledgerBytes.(map[string]interface{})
+	if !found {
+		log.Errorf("updateAsset assetID %s of type %s LEDGER state is not a map shape", assetID, accountID)
+		return nil, err
+	}
+
+fmt.Println("ledgerMap",ledgerMap)
+	stateOut := deepMerge(map[string]interface{}(argsMap),
+		map[string]interface{}(ledgerMap))
+	log.Debugf("updateAsset assetID %s merged state: %s of type %s", assetID, accountID, stateOut)
+
+	// save the original event
+	stateOut["lastEvent"] = make(map[string]interface{})
+	
+
+	// Write the new state to the ledger
+	stateJSON, err := json.Marshal(ledgerMap)
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s marshal failed: %s", assetID, accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+
+	// finally, put the new state
+	err = stub.PutState(sAccountKey, []byte(stateJSON))
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s PUTSTATE failed: %s", assetID, accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+
+	err = pushRecentState(stub, string(stateJSON),"2")
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s push to recentstates failed: %s", assetID, err)
+		log.Error(err)
+		return nil, err
+	}
+
+	// add history state
+	err = updateStateHistory(stub, sAccountKey, string(stateJSON))
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s push to history failed: %s", assetID, accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+
+	return nil, nil
+
+	}
+
+	stateOut := argsMap
+
+	// save the original event
+	stateOut["lastEvent"] = make(map[string]interface{})
+	//stateOut["lastEvent"].(map[string]interface{})["function"] = "issueAsset"
+	//stateOut["lastEvent"].(map[string]interface{})["args"] = args[0]
+	if len(args) == 2 {
+		// in-band protocol for redirect
+		stateOut["lastEvent"].(map[string]interface{})["redirectedFromFunction"] = args[1]
+	}
+
+	// marshal to JSON and write
+	stateJSON, err := json.Marshal(&stateOut)
+	if err != nil {
+		err := fmt.Errorf("createAccount state for accountID %s failed to marshal", accountID)
+		log.Error(err)
+		return nil, err
+	}
+
+	// finally, put the new state
+	log.Infof("Putting new account state %s to ledger", string(stateJSON))
+	// The key i 'assetid'_'type'
+
+	err = stub.PutState(sAccountKey, []byte(stateJSON))
+	if err != nil {
+		err = fmt.Errorf("createAccount accountID %s PUTSTATE failed: %s", accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+	log.Infof("createAccount accountID  state %s successfully written to ledger: %s", accountID,  string(stateJSON))
+
+	// add asset to contract state
+	err = addAccountToContractState(stub, sAccountKey,"issue")
+	if err != nil {
+		err := fmt.Errorf("createAccount asset %s  failed to write asset state: %s", accountID,  err)
+		log.Critical(err)
+		return nil, err
+	}
+     fmt.Println("stateJSON",stateJSON)
+	err = pushRecentState(stub, string(stateJSON),"2")
+	if err != nil {
+		err = fmt.Errorf("createAccount accountID %s  push to recentstates failed: %s", accountID,  err)
+		log.Error(err)
+		return nil, err
+	}
+
+	// save state history
+	err = createStateHistory(stub, sAccountKey, string(stateJSON))
+	if err != nil {
+		err := fmt.Errorf("createAccount asset %s of type %s state history save failed: %s", accountID, sAccountKey, err)
+		log.Critical(err)
+		return nil, err
+	}
+	return nil, nil
 }
