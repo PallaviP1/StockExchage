@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 	 "sort"
+	 "strconv"
 
 )
 
@@ -3058,13 +3059,17 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 	}
 
 	// assert the existing state as a map
+
 	ledgerMap, found = ledgerBytes.(map[string]interface{})
 	if !found {
 		log.Errorf("updateAsset assetID %s of type %s LEDGER state is not a map shape", assetID, accountID)
 		return nil, err
 	}
-
-fmt.Println("ledgerMap",ledgerMap)
+	  i, errInt := strconv.ParseInt(ledgerMap["amount"].(string), 10, 64)
+ j, errInt := strconv.ParseInt(argsMap["amount"].(string), 10, 64)
+var str=i+j
+	ledgerMap["amount"]= str
+fmt.Println("ledgerMap :",ledgerMap["amount"])
 	stateOut := deepMerge(map[string]interface{}(argsMap),
 		map[string]interface{}(ledgerMap))
 	log.Debugf("updateAsset assetID %s merged state: %s of type %s", assetID, accountID, stateOut)
