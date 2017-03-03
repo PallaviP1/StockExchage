@@ -2978,7 +2978,7 @@ func getissueActiveAccounts(stub shim.ChaincodeStubInterface) ([]string, error) 
 //*****************************************************************Transfer******************************************
 
 func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	var accountIDFrom string
+//	var accountIDFrom string
 	var accountIDTo string
 	var assetID string
 var accountID string
@@ -3032,7 +3032,7 @@ var accountID string
 	}
 
 	// is accountID present or blank?
-	assetIDBytes, found := getObject(argsMap, ACCOUNTIDTO)
+	assetIDBytes, found := getObject(argsMap, ACCOUNTID)
 	fmt.Println("assetIDBytes1==",assetIDBytes)
 	
 	if found {
@@ -3054,8 +3054,18 @@ var accountID string
 		}
 	}
 
-
-	sAccountKeyFrom := accountIDFrom + "_" + assetID
+assetIDBytes1, found := getObject(argsMap, ACCOUNTIDTO)
+	fmt.Println("assetIDBytes1==",assetIDBytes)
+	
+	if found {
+		accountIDTo, found = assetIDBytes1.(string)
+		if !found || accountID == "" {
+			err := errors.New("createAccount arg does not include accountID ")
+			log.Error(err)
+			return nil, err
+		}
+	}
+	sAccountKeyFrom := accountID + "_" + assetID
 
       assetBytes, err := stub.GetState(sAccountKeyFrom)
 		fmt.Println("assetBytes",assetBytes)
