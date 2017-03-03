@@ -2982,7 +2982,7 @@ var accountID string
 	var argsMap ArgsMap
 		//var argsMapTo ArgsMap
 	var event interface{}
-		var eventTo interface{}
+	//	var eventTo interface{}
 	var ledgerMap ArgsMap
 	var ledgerBytes interface{}
 	var found bool
