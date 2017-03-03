@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 	 "sort"
+	 "strconv"
 	
 
 )
@@ -1900,6 +1901,12 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
 					fmt.Println("v4: ",v)
 					 if strings.ToLower(dstKey) == strings.ToLower("amount") {
                        fmt.Println("v5: ",src[dstKey])
+					   var s = dst[dstKey]
+    // Convert string to int.
+    number, _ := strconv.ParseInt(s.(string), 10, 0)
+    // We now have an int.
+					 
+					   v = v.(int64) + number
 					   dst[dstKey] = v 
                  } else {
                     dst[dstKey] = v
