@@ -134,6 +134,9 @@ const ASSETNAME string = "name"
 
 // ACCOUNTID is the JSON tag for the assetID
 const ACCOUNTID string = "accountID"
+// ACCOUNTID is the JSON tag for the assetID
+const ACCOUNTIDTO string = "accountIDTo"
+
 
 //// ACCOUNTNAME Asset description from which type is inferred
 const ACCOUNTNAME string = "acname"
@@ -3029,8 +3032,8 @@ var accountID string
 	}
 
 	// is accountID present or blank?
-	assetIDBytes, found := getObject(argsMap, ACCOUNTID)
-	fmt.Println("assetIDBytes",assetIDBytes)
+	assetIDBytes, found := getObject(argsMap, ACCOUNTIDTO)
+	fmt.Println("assetIDBytes1==",assetIDBytes)
 	
 	if found {
 		accountID, found = assetIDBytes.(string)
