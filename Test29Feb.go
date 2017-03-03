@@ -1856,11 +1856,14 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
     }
     for k, v := range src {
         switch v.(type) {
+			fmt.Println("K",k)
             case map[string]interface{}:
                 // don't try hoisting dstKey calculation
                 dstKey, found := findMatchingKey(dst, k)
                 if found {
                     dstChild, found := dst[dstKey].(map[string]interface{})
+					fmt.Println("dst1 ==",dst[dstKey].(map[string]interface{}))
+					
 					fmt.Println("dstchild :",dstChild)
                     if found {
                         // recursive deepMerge into existing key
@@ -1868,12 +1871,14 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
                     } 
                 } else {
                     // copy entire map to incoming key
+					fmt.Println("v1: ",v)
                     dst[k] = v
                 }
             case []interface{}:
                 dstKey, found := findMatchingKey(dst, k)
                 if found {
                     dstChild, found := dst[dstKey].([]interface{})
+					fmt.Println("dstchild1 :",dstChild)
                     if found {
                         // union
                         for elem := range v.([]interface{}) {
@@ -1885,14 +1890,17 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
                 } else {
                     // copy
                     dst[k] = v
+						fmt.Println("v2: ",v)
                 }
             default:
                 // copy discrete types 
                 dstKey, found := findMatchingKey(dst, k)
                 if found {
+					fmt.Println("v4: ",v)
                     dst[dstKey] = v
                 } else {
                     dst[k] = v
+					fmt.Println("v3: ",v)
                 }
         }
 		fmt.Println("v:",v)
