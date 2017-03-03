@@ -1856,6 +1856,7 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
     }
     for k, v := range src {
 		fmt.Println("K",k)
+		
         switch v.(type) {
             case map[string]interface{}:
                 // don't try hoisting dstKey calculation
@@ -1897,12 +1898,11 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
                 dstKey, found := findMatchingKey(dst, k)
                 if found {
 					fmt.Println("v4: ",v)
-					fmt.Println("vtype==",v.(type))
-				  if strings.ToLower(dstKey) == strings.ToLower("amount")) {
-					{
-							fmt.Println("v5: ",src[dstKey])
-                     dst[dstKey] = v 
-					} else {
+					
+					 if strings.ToLower(dstKey) == strings.ToLower("amount") {
+                       fmt.Println("v5: ",src[dstKey])
+					   dst[dstKey] = v 
+                 } else {
                     dst[dstKey] = v
 					}
                 } else {
