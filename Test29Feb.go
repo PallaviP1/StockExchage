@@ -2980,7 +2980,7 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 	var assetID string
 var accountID string
 	var argsMap ArgsMap
-		var argsMapTo ArgsMap
+		//var argsMapTo ArgsMap
 	var event interface{}
 		var eventTo interface{}
 	var ledgerMap ArgsMap
