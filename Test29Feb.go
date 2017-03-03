@@ -12,7 +12,6 @@ import (
 	"time"
 	 "sort"
 	
-	
 
 )
 
@@ -1856,31 +1855,28 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
         return nil 
     }
     for k, v := range src {
-		fmt.Println("K",k)
-		
+	
         switch v.(type) {
             case map[string]interface{}:
                 // don't try hoisting dstKey calculation
                 dstKey, found := findMatchingKey(dst, k)
                 if found {
                     dstChild, found := dst[dstKey].(map[string]interface{})
-					fmt.Println("dst1 ==",dst[dstKey].(map[string]interface{}))
 					
-					fmt.Println("dstchild :",dstChild)
                     if found {
                         // recursive deepMerge into existing key
                         dst[dstKey] = deepMerge(v.(map[string]interface{}), dstChild)
                     } 
                 } else {
                     // copy entire map to incoming key
-					fmt.Println("v1: ",v)
+					
                     dst[k] = v
                 }
             case []interface{}:
                 dstKey, found := findMatchingKey(dst, k)
                 if found {
                     dstChild, found := dst[dstKey].([]interface{})
-					fmt.Println("dstchild1 :",dstChild)
+				
                     if found {
                         // union
                         for elem := range v.([]interface{}) {
@@ -1892,30 +1888,21 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
                 } else {
                     // copy
                     dst[k] = v
-						fmt.Println("v2: ",v)
+					
                 }
             default:
                 // copy discrete types 
                 dstKey, found := findMatchingKey(dst, k)
                 if found {
-					fmt.Println("v4: ",v)
-					 if strings.ToLower(dstKey) == strings.ToLower("amount") {
-                       fmt.Println("v5: ",src[dstKey])
-					   var s = dst[dstKey]
-    
-					 
-					   v = v.(float64) + s.( float64)
-					   dst[dstKey] = v 
-					   fmt.Println("v8:", dst[dstKey])
-                 } else {
+					
                     dst[dstKey] = v
-					}
+					
                 } else {
                     dst[k] = v
-					fmt.Println("v3: ",v)
+				
                 }
         }
-		fmt.Println("v:",v)
+		
     }
     return dst
 }
@@ -2988,16 +2975,19 @@ func getissueActiveAccounts(stub shim.ChaincodeStubInterface) ([]string, error) 
 //*****************************************************************Transfer******************************************
 
 func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	var accountID string
-
+	var accountIDFrom string
+	var accountIDTo string
 	var assetID string
-//	var amount int
+var accountID string
 	var argsMap ArgsMap
+		var argsMapTo ArgsMap
 	var event interface{}
+		var eventTo interface{}
 	var ledgerMap ArgsMap
 	var ledgerBytes interface{}
 	var found bool
 	var err error
+	
 	//var timeIn time.Time
 
 	log.Info("Entering createAsset")
@@ -3010,8 +3000,9 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 		return nil, err
 	}
 
-	accountID = ""
+	accountID=""
 //	amount = 0
+
 	eventBytes := []byte(args[0])
 	log.Debugf("createAccount arg: %s", args[0])
 	fmt.Println("args[0]",args[0])
@@ -3028,6 +3019,12 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 	}
 
 	argsMap, found = event.(map[string]interface{})
+
+	argsTo := []string{ "{'accountID':argsMap['accountIDTo'],'assetID':argsMap['assetID'],'amount':argsMap['amount']}"}
+	eventBytesTo := []byte(argsTo[0])
+	err = json.Unmarshal(eventBytes, &eventTo)
+	argsMapTo, found = eventTo.(map[string]interface{})
+
 	fmt.Println("argsMap",argsMap)
 	if !found {
 		err := errors.New("createAccount arg is not a map shape")
@@ -3059,13 +3056,9 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 	}
 
 
-	sAccountKey := accountID + "_" + assetID
-	fmt.Println("sAccountKey:", sAccountKey)
-	found = issueAccountIsActive(stub, sAccountKey)
-	if found {
-	
-		fmt.Println("found")
-		assetBytes, err := stub.GetState(sAccountKey)
+	sAccountKeyFrom := accountIDFrom + "_" + assetID
+
+      assetBytes, err := stub.GetState(sAccountKeyFrom)
 		fmt.Println("assetBytes",assetBytes)
 	if err != nil {
 		log.Errorf("updateAsset assetID %s of type %s GETSTATE failed: %s", assetID, accountID, err)
@@ -3087,9 +3080,11 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 		return nil, err
 	}
 	
-fmt.Println("ledgerMap :",ledgerMap["amount"])
-	stateOut := deepMerge(map[string]interface{}(argsMap),
-		map[string]interface{}(ledgerMap))
+	   ledgerMap["amount"] =ledgerMap["amount"].(float64) - argsMap["amount"].( float64)
+fmt.Println("ledgerMapFrom :",ledgerMap["amount"])
+  
+	 fmt.Println("ledgerMap2== " ,ledgerMap)
+	stateOut := map[string]interface{}(ledgerMap)
 	log.Debugf("updateAsset assetID %s merged state: %s of type %s", assetID, accountID, stateOut)
 
 	// save the original event
@@ -3105,7 +3100,7 @@ fmt.Println("ledgerMap :",ledgerMap["amount"])
 	}
 
 	// finally, put the new state
-	err = stub.PutState(sAccountKey, []byte(stateJSON))
+	err = stub.PutState(sAccountKeyFrom, []byte(stateJSON))
 	if err != nil {
 		err = fmt.Errorf("updateAsset AssetID %s of type %s PUTSTATE failed: %s", assetID, accountID, err)
 		log.Error(err)
@@ -3120,7 +3115,75 @@ fmt.Println("ledgerMap :",ledgerMap["amount"])
 	}
 
 	// add history state
-	err = updateStateHistory(stub, sAccountKey, string(stateJSON))
+	err = updateStateHistory(stub, sAccountKeyFrom, string(stateJSON))
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s push to history failed: %s", assetID, accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+
+	sAccountKeyTo := accountIDTo + "_" + assetID
+	found = issueAccountIsActive(stub, sAccountKeyTo)
+	if found {
+	
+		
+		assetBytes, err = stub.GetState(sAccountKeyTo)
+		fmt.Println("assetBytes",assetBytes)
+	if err != nil {
+		log.Errorf("updateAsset assetID %s of type %s GETSTATE failed: %s", assetID, accountID, err)
+		return nil, err
+	}
+
+	// unmarshal the existing state from the ledger to theinterface
+	err = json.Unmarshal(assetBytes, &ledgerBytes)
+	if err != nil {
+		log.Errorf("updateAsset assetID %s of type %s unmarshal failed: %s", assetID, accountID, err)
+		return nil, err
+	}
+
+	// assert the existing state as a map
+
+	ledgerMap, found = ledgerBytes.(map[string]interface{})
+	if !found {
+		log.Errorf("updateAsset assetID %s of type %s LEDGER state is not a map shape", assetID, accountID)
+		return nil, err
+	}
+	
+	   ledgerMap["amount"] =ledgerMap["amount"].(float64) + argsMap["amount"].( float64)
+     fmt.Println("ledgerMapTo :",ledgerMap["amount"])
+	 fmt.Println("ledgerMap2== " ,ledgerMap)
+	stateOut := map[string]interface{}(ledgerMap)
+	log.Debugf("updateAsset assetID %s merged state: %s of type %s", assetID, accountID, stateOut)
+
+	// save the original event
+	stateOut["lastEvent"] = make(map[string]interface{})
+	
+
+	// Write the new state to the ledger
+	stateJSON, err := json.Marshal(ledgerMap)
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s marshal failed: %s", assetID, accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+
+	// finally, put the new state
+	err = stub.PutState(sAccountKeyTo, []byte(stateJSON))
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s PUTSTATE failed: %s", assetID, accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+
+	err = pushRecentState(stub, string(stateJSON),"2")
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s push to recentstates failed: %s", assetID, err)
+		log.Error(err)
+		return nil, err
+	}
+
+	// add history state
+	err = updateStateHistory(stub, sAccountKeyTo, string(stateJSON))
 	if err != nil {
 		err = fmt.Errorf("updateAsset AssetID %s of type %s push to history failed: %s", assetID, accountID, err)
 		log.Error(err)
@@ -3129,9 +3192,10 @@ fmt.Println("ledgerMap :",ledgerMap["amount"])
 
 	return nil, nil
 
-	}
+	} 
 //****************************************
-	stateOut := argsMap
+
+	stateOut = argsMapTo
 
 	// save the original event
 	stateOut["lastEvent"] = make(map[string]interface{})
@@ -3143,7 +3207,7 @@ fmt.Println("ledgerMap :",ledgerMap["amount"])
 	}
 
 	// marshal to JSON and write
-	stateJSON, err := json.Marshal(&stateOut)
+	stateJSON, err = json.Marshal(&stateOut)
 	if err != nil {
 		err := fmt.Errorf("createAccount state for accountID %s failed to marshal", accountID)
 		log.Error(err)
@@ -3154,7 +3218,7 @@ fmt.Println("ledgerMap :",ledgerMap["amount"])
 	log.Infof("Putting new account state %s to ledger", string(stateJSON))
 	// The key i 'assetid'_'type'
 
-	err = stub.PutState(sAccountKey, []byte(stateJSON))
+	err = stub.PutState(sAccountKeyTo, []byte(stateJSON))
 	if err != nil {
 		err = fmt.Errorf("createAccount accountID %s PUTSTATE failed: %s", accountID, err)
 		log.Error(err)
@@ -3163,13 +3227,13 @@ fmt.Println("ledgerMap :",ledgerMap["amount"])
 	log.Infof("createAccount accountID  state %s successfully written to ledger: %s", accountID,  string(stateJSON))
 
 	// add asset to contract state
-	err = addAccountToContractState(stub, sAccountKey,"issue")
+	err = addAccountToContractState(stub, sAccountKeyTo,"issue")
 	if err != nil {
 		err := fmt.Errorf("createAccount asset %s  failed to write asset state: %s", accountID,  err)
 		log.Critical(err)
 		return nil, err
 	}
-     fmt.Println("stateJSON",stateJSON)
+     fmt.Println("stateJSON== ",stateJSON)
 	err = pushRecentState(stub, string(stateJSON),"2")
 	if err != nil {
 		err = fmt.Errorf("createAccount accountID %s  push to recentstates failed: %s", accountID,  err)
@@ -3178,9 +3242,9 @@ fmt.Println("ledgerMap :",ledgerMap["amount"])
 	}
 
 	// save state history
-	err = createStateHistory(stub, sAccountKey, string(stateJSON))
+	err = createStateHistory(stub, sAccountKeyTo, string(stateJSON))
 	if err != nil {
-		err := fmt.Errorf("createAccount asset %s of type %s state history save failed: %s", accountID, sAccountKey, err)
+		err := fmt.Errorf("createAccount asset %s of type %s state history save failed: %s", accountID, sAccountKeyTo, err)
 		log.Critical(err)
 		return nil, err
 	}
