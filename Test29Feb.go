@@ -3022,9 +3022,9 @@ var accountID string
 
 	argsTo := []string{ "{'accountID':argsMap['accountIDTo'],'assetID':argsMap['assetID'],'amount':argsMap['amount']}"}
 	eventBytesTo := []byte(argsTo[0])
-	err = json.Unmarshal(eventBytes, &eventTo)
+	err = json.Unmarshal(eventBytesTo, &eventTo)
 	argsMapTo, found = eventTo.(map[string]interface{})
-
+// From Account
 	fmt.Println("argsMap",argsMap)
 	if !found {
 		err := errors.New("createAccount arg is not a map shape")
