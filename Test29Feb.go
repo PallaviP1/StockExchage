@@ -1897,7 +1897,14 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
                 dstKey, found := findMatchingKey(dst, k)
                 if found {
 					fmt.Println("v4: ",v)
+					fmt.Println("vtype==",v.(type))
+				  if strings.ToLower(dstKey) == strings.ToLower("amount")) {
+					{
+							fmt.Println("v5: ",src[dstKey])
+                     dst[dstKey] = v 
+					} else {
                     dst[dstKey] = v
+					}
                 } else {
                     dst[k] = v
 					fmt.Println("v3: ",v)
