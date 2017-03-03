@@ -3020,10 +3020,6 @@ var accountID string
 
 	argsMap, found = event.(map[string]interface{})
 
-	argsTo := []string{ "{'accountID':argsMap['accountIDTo'],'assetID':argsMap['assetID'],'amount':argsMap['amount']}"}
-	eventBytesTo := []byte(argsTo[0])
-	err = json.Unmarshal(eventBytesTo, &eventTo)
-	argsMapTo, found = eventTo.(map[string]interface{})
 // From Account
 	fmt.Println("argsMap",argsMap)
 	if !found {
@@ -3122,6 +3118,9 @@ fmt.Println("ledgerMapFrom :",ledgerMap["amount"])
 		return nil, err
 	}
 
+
+	
+
 	sAccountKeyTo := accountIDTo + "_" + assetID
 	found = issueAccountIsActive(stub, sAccountKeyTo)
 	if found {
@@ -3194,8 +3193,15 @@ fmt.Println("ledgerMapFrom :",ledgerMap["amount"])
 
 	} 
 //****************************************
-
-	stateOut = argsMapTo
+/*var argsTo []string
+ argsTo = append(argsTo ,[]string{{"accountID": argsMap["accountIDTo"].(string),"assetID":argsMap["assetID"].(string),"amount":argsMap["amount"].(string)}})
+  //  argsTo := []string{ "{'accountID':"+argsMap["accountIDTo"]+",'assetID':"+argsMap["assetID"]+",'amount':"+argsMap["amount"]+"}"}
+	eventBytesTo := []byte(argsTo[0])
+	fmt.Println("to==",argsTo[0])
+	err = json.Unmarshal(eventBytesTo, &eventTo)
+	argsMapTo, found = eventTo.(map[string]interface{})
+	fmt.Println("argsMapTo==", argsMapTo)8*/
+	stateOut = argsMap 
 
 	// save the original event
 	stateOut["lastEvent"] = make(map[string]interface{})
