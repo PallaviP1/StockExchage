@@ -1902,12 +1902,11 @@ func deepMerge(srcIn interface{}, dstIn interface{}) (map[string]interface{}){
 					 if strings.ToLower(dstKey) == strings.ToLower("amount") {
                        fmt.Println("v5: ",src[dstKey])
 					   var s = dst[dstKey]
-    // Convert string to int.
-    number, _ := strconv.ParseInt(s.(string), 10, 0)
-    // We now have an int.
+    
 					 
-					   v = v.(int64) + number
+					   v = v.(float64) + s.( float64)
 					   dst[dstKey] = v 
+					   fmt.Println("v8:", dst[dstKey])
                  } else {
                     dst[dstKey] = v
 					}
