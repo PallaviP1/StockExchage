@@ -3237,11 +3237,12 @@ err = pushRecentState(stub, string(stateJSON),"3")
 //****************************************
  accId:=argsMap["accountIDTo"].(string)
 assId:=argsMap["assetID"].(string)
-amt:=argsMap["amount"].
+amt:=argsMap["amount"].(string)
 row1 := []string{"{\"accountID\":\""+accId+"\", \"assetID\":\""+assId+"\", \"amount\":"+amt+"}"}
+	fmt.Println("to==",row1)
+	fmt.Println("to[0]==",row1[0])
+	eventBytesTo := []byte(row1[0])
 
-	eventBytesTo := []byte(argsTo[0])
-	fmt.Println("to==",argsTo[0])
 	err = json.Unmarshal(eventBytesTo, &eventTo)
 	argsMapTo, found = eventTo.(map[string]interface{})
 	fmt.Println("argsMapTo==", argsMapTo)
