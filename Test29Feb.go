@@ -3235,13 +3235,29 @@ err = pushRecentState(stub, string(stateJSON),"3")
 
 	} 
 //****************************************
- accId:=argsMap["accountIDTo"].(string)
-assId:=argsMap["assetID"].(string)
-amt:=argsMap["amount"].(string)
-row1 := []string{"{\"accountID\":\""+accId+"\", \"assetID\":\""+assId+"\", \"amount\":"+amt+"}"}
-	fmt.Println("to==",row1)
-	fmt.Println("to[0]==",row1[0])
-	eventBytesTo := []byte(row1[0])
+ ///accId:=argsMap["accountIDTo"].(string)
+//assId:=argsMap["assetID"].(string)
+//amt:=argsMap["amount"].(float64)
+ jsonData:=args[0]
+ result := strings.Split(jsonData, ",")
+ fmt.Println("result of Split=" , result)
+ 
+ fromAcc := make([]string, 3)
+ fromAcc[0] = result[0]
+ fromAcc[1] = result[2]
+ fromAcc[2] = result[3]
+ fmt.Println("fromAcc array=",fromAcc)
+
+ toAcc := make([]string, 3)
+ toAcc[0] = result[1]
+ toAcc[1] = result[2]
+ toAcc[2] = result[3]
+ fmt.Println("toAcc array=",toAcc)
+ 
+//row1 := []string{"{\"accountID\":\""+accId+"\", \"assetID\":\""+assId+"\", \"amount\":"+amt+"}"}
+	fmt.Println("to==",toAcc)
+	fmt.Println("to[0]==",toAcc[0])
+	eventBytesTo := []byte(toAcc[0])
 
 	err = json.Unmarshal(eventBytesTo, &eventTo)
 	argsMapTo, found = eventTo.(map[string]interface{})
