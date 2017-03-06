@@ -2622,6 +2622,8 @@ func addAccountToContractState(stub shim.ChaincodeStubInterface, sAssetKey strin
     state.ActiveAccounts[sAssetKey] = true
 	}else if(transType== "issue"){
 		 state.IssueAccounts[sAssetKey] = true
+	}else if(transType== "transfer"){
+		 state.TransferAccounts[sAssetKey] = true
 	}
     return PUTContractStateToLedger(stub, state)
 }// ************************************
@@ -3210,7 +3212,13 @@ fmt.Println("ledgerMapFrom :",ledgerMap["amount"])
 
 	err = pushRecentState(stub, string(stateJSON),"2")
 	if err != nil {
-		err = fmt.Errorf("updateAsset AssetID %s push to recentstates failed: %s", assetID, err)
+		err = fmt.Errorf("transferAsset AssetID %s push to recentstates failed: %s", assetID, err)
+		log.Error(err)
+		return nil, err
+	}
+err = pushRecentState(stub, string(stateJSON),"3")
+	if err != nil {
+		err = fmt.Errorf("transferAsset AssetID %s push to recentstates failed: %s", assetID, err)
 		log.Error(err)
 		return nil, err
 	}
@@ -3267,7 +3275,7 @@ fmt.Println("ledgerMapFrom :",ledgerMap["amount"])
 	log.Infof("createAccount accountID  state %s successfully written to ledger: %s", accountID,  string(stateJSON))
 
 	// add asset to contract state
-	err = addAccountToContractState(stub, sAccountKeyTo,"Transfer")
+	err = addAccountToContractState(stub, sAccountKeyTo,"issue")
 	if err != nil {
 		err := fmt.Errorf("createAccount asset %s  failed to write asset state: %s", accountID,  err)
 		log.Critical(err)
@@ -3281,6 +3289,14 @@ fmt.Println("ledgerMapFrom :",ledgerMap["amount"])
 		return nil, err
 	}
 //For Transfer
+	// add asset to contract state
+	err = addAccountToContractState(stub, sAccountKeyTo,"transfer")
+	if err != nil {
+		err := fmt.Errorf("createAccount asset %s  failed to write asset state: %s", accountID,  err)
+		log.Critical(err)
+		return nil, err
+	}
+
 	err = pushRecentState(stub, string(stateJSON),"3")
 	if err != nil {
 		err = fmt.Errorf("createAccount accountID %s  push to recentstates failed: %s", accountID,  err)
