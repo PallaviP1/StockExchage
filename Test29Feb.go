@@ -3006,9 +3006,9 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 	var assetID string
     var accountID string
 	var argsMap ArgsMap
-		//var argsMapTo ArgsMap
+		var argsMapTo ArgsMap
 	var event interface{}
-	//	var eventTo interface{}
+		var eventTo interface{}
 	var ledgerMap ArgsMap
 	var ledgerBytes interface{}
 	var found bool
@@ -3235,14 +3235,26 @@ err = pushRecentState(stub, string(stateJSON),"3")
 
 	} 
 //****************************************
-/*var argsTo []string
- argsTo = append(argsTo ,[]string{{"accountID": argsMap["accountIDTo"].(string),"assetID":argsMap["assetID"].(string),"amount":argsMap["amount"].(string)}})
-  //  argsTo := []string{ "{'accountID':"+argsMap["accountIDTo"]+",'assetID':"+argsMap["assetID"]+",'amount':"+argsMap["amount"]+"}"}
+ accId:=argsMap["accountIDTo"].(string)
+assId:=argsMap["assetID"].(string)
+amt:=argsMap["amount"].
+row1 := []string{"{\"accountID\":\""+accId+"\", \"assetID\":\""+assId+"\", \"amount\":"+amt+"}"}
+
 	eventBytesTo := []byte(argsTo[0])
 	fmt.Println("to==",argsTo[0])
 	err = json.Unmarshal(eventBytesTo, &eventTo)
 	argsMapTo, found = eventTo.(map[string]interface{})
-	fmt.Println("argsMapTo==", argsMapTo)8*/
+	fmt.Println("argsMapTo==", argsMapTo)
+stateJSONIssue, err := json.Marshal(&argsMapTo)
+	if err != nil {
+		err := fmt.Errorf("createAccount state for accountID %s failed to marshal", accountID)
+		log.Error(err)
+		return nil, err
+	}
+
+
+
+
 	stateOut = argsMap 
 
 	// save the original event
@@ -3266,7 +3278,7 @@ err = pushRecentState(stub, string(stateJSON),"3")
 	log.Infof("Putting new account state %s to ledger", string(stateJSON))
 	// The key i 'assetid'_'type'
 
-	err = stub.PutState(sAccountKeyTo, []byte(stateJSON))
+	err = stub.PutState(sAccountKeyTo, []byte(stateJSONIssue))
 	if err != nil {
 		err = fmt.Errorf("createAccount accountID %s PUTSTATE failed: %s", accountID, err)
 		log.Error(err)
@@ -3281,8 +3293,8 @@ err = pushRecentState(stub, string(stateJSON),"3")
 		log.Critical(err)
 		return nil, err
 	}
-     fmt.Println("stateJSON== ",stateJSON)
-	err = pushRecentState(stub, string(stateJSON),"2")
+     fmt.Println("stateJSONIssue== ",stateJSONIssue)
+	err = pushRecentState(stub, string(stateJSONIssue),"2")
 	if err != nil {
 		err = fmt.Errorf("createAccount accountID %s  push to recentstates failed: %s", accountID,  err)
 		log.Error(err)
