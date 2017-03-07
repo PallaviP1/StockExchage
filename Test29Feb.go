@@ -3250,7 +3250,7 @@ jsonData:=args[0]
 
  
   
-row1 := []string{"{\"accountID:\""+accId+"\","+result[1]+","+ result[2]+","+result[3]}
+row1 := []string{"{\"accountID:\""+accId+"\","+ result[2]+","+result[3]}
 	//fmt.Println("to==",toAcc)
 	fmt.Println("to[0]==",row1[0])
 		fmt.Println("to[0]==",row1)
