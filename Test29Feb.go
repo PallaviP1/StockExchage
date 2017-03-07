@@ -3217,12 +3217,7 @@ fmt.Println("ledgerMapFrom :",ledgerMap["amount"])
 		log.Error(err)
 		return nil, err
 	}
-err = pushRecentState(stub, string(stateJSON),"3")
-	if err != nil {
-		err = fmt.Errorf("transferAsset AssetID %s push to recentstates failed: %s", assetID, err)
-		log.Error(err)
-		return nil, err
-	}
+
 
 	// add history state
 	err = updateStateHistory(stub, sAccountKeyTo, string(stateJSON))
@@ -3231,6 +3226,76 @@ err = pushRecentState(stub, string(stateJSON),"3")
 		log.Error(err)
 		return nil, err
 	}
+
+//Transfer
+sAccountKeyToTransfer:=sAccountKeyTo+"_Transfer"
+found = transferAccountIsActive(stub,sAccountKeyToTransfer )
+	if found {
+	
+		
+		assetBytes, err = stub.GetState(sAccountKeyToTransfer)
+		fmt.Println("assetBytes",assetBytes)
+	if err != nil {
+		log.Errorf("updateAsset assetID %s of type %s GETSTATE failed: %s", assetID, accountID, err)
+		return nil, err
+	}
+
+	// unmarshal the existing state from the ledger to theinterface
+	err = json.Unmarshal(assetBytes, &ledgerBytes)
+	if err != nil {
+		log.Errorf("updateAsset assetID %s of type %s unmarshal failed: %s", assetID, accountID, err)
+		return nil, err
+	}
+
+	// assert the existing state as a map
+
+	ledgerMap, found = ledgerBytes.(map[string]interface{})
+	if !found {
+		log.Errorf("updateAsset assetID %s of type %s LEDGER state is not a map shape", assetID, accountID)
+		return nil, err
+	}
+	
+	  ledgerMap["amount"] =ledgerMap["amount"].(float64) + argsMap["amount"].( float64)
+     fmt.Println("ledgerMapTo :",ledgerMap["amount"])
+	 fmt.Println("ledgerMap2== " ,ledgerMap)
+	stateOut := map[string]interface{}(ledgerMap)
+	log.Debugf("updateAsset assetID %s merged state: %s of type %s", assetID, accountID, stateOut)
+
+	// save the original event
+	stateOut["lastEvent"] = make(map[string]interface{})
+	
+
+	// Write the new state to the ledger
+	stateJSONTransfer, err := json.Marshal(ledgerMap)
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s marshal failed: %s", assetID, accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+	// finally, put the new state
+	err = stub.PutState(sAccountKeyToTransfer, []byte(stateJSONTransfer))
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s PUTSTATE failed: %s", assetID, accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+	err = pushRecentState(stub, string(stateJSONTransfer),"3")
+	if err != nil {
+		err = fmt.Errorf("transferAsset AssetID %s push to recentstates failed: %s", assetID, err)
+		log.Error(err)
+		return nil, err
+	}
+	// add history state
+	err = updateStateHistory(stub, sAccountKeyToTransfer, string(stateJSONTransfer))
+	if err != nil {
+		err = fmt.Errorf("updateAsset AssetID %s of type %s push to history failed: %s", assetID, accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+	}
+
+//End Transfer
+
 
 	return nil, nil
 
@@ -3420,5 +3485,14 @@ func getTransferActiveAccounts(stub shim.ChaincodeStubInterface) ([]string, erro
     sort.Strings(a)
 	fmt.Println("a:",a)
     return a, nil
+}
+
+func transferAccountIsActive(stub shim.ChaincodeStubInterface, sAssetKey string) (bool) {
+    var state ContractState
+    var err error
+    state, err = GETContractStateFromLedger(stub)
+    if err != nil { return false}
+    found, _ := state.TransferAccounts[sAssetKey]
+    return found
 }
 
