@@ -3251,9 +3251,10 @@ jsonData:=args[0]
 
  
   
-row1 := []string{"{\"accountID:\""+accId+"\","+ result[2]+","+result[3]}
+
+args1 = []string{"{\"accountID:\""+accId+"\","+ result[2]+","+result[3]}
 	//fmt.Println("to==",toAcc)
-	args1=row1
+
 	fmt.Println("row1[0]==",args1[0])
 		fmt.Println("to[0]==",args1)
 	eventBytesTo := []byte(args1[0])
