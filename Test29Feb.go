@@ -3242,18 +3242,18 @@ err = pushRecentState(stub, string(stateJSON),"3")
  result := strings.Split(jsonData, ",")
  fmt.Println("result of Split=" , result)
  
+ fromAcc := make([]string, 3)
+ fromAcc[0] = result[1]
+ fromAcc[1] = result[2]
+ fromAcc[2] = result[3]
+ fmt.Println("fromAcc array=",fromAcc)
 
-
- toAcc := make([]string, 3)
- toAcc[0] = result[1]
- toAcc[1] = result[2]
- toAcc[2] = result[3]
- fmt.Println("toAcc array=",toAcc)
+ 
  
 //row1 := []string{"{\"accountID\":\""+accId+"\", \"assetID\":\""+assId+"\", \"amount\":"+amt+"}"}
-	fmt.Println("to==",toAcc)
-	fmt.Println("to[0]==",toAcc[0])
-	eventBytesTo := []byte(toAcc[0])
+	//fmt.Println("to==",toAcc)
+	fmt.Println("to[0]==",fromAcc[0])
+	eventBytesTo := []byte(fromAcc[0])
 
 	err = json.Unmarshal(eventBytesTo, &eventTo)
 	argsMapTo, found = eventTo.(map[string]interface{})
