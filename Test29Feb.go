@@ -3252,7 +3252,8 @@ jsonData:=args[0]
   
 row1 := []string{"{\"accountID\":\""+result[1]+"\", \"assetID\":\""+result[2]+"\", \"amount\":"+result[3]+"}"}
 	//fmt.Println("to==",toAcc)
-//	fmt.Println("to[0]==",fromAcc[0])
+	fmt.Println("to[0]==",row1[0])
+		fmt.Println("to[0]==",row1)
 	eventBytesTo := []byte(row1[0])
 
 	err = json.Unmarshal(eventBytesTo, &eventTo)
