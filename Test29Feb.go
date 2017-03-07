@@ -3242,11 +3242,7 @@ err = pushRecentState(stub, string(stateJSON),"3")
  result := strings.Split(jsonData, ",")
  fmt.Println("result of Split=" , result)
  
- fromAcc := make([]string, 3)
- fromAcc[0] = result[0]
- fromAcc[1] = result[2]
- fromAcc[2] = result[3]
- fmt.Println("fromAcc array=",fromAcc)
+
 
  toAcc := make([]string, 3)
  toAcc[0] = result[1]
