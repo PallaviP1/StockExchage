@@ -3250,13 +3250,13 @@ jsonData:=args[0]
  fmt.Println("fromAcc array=",fromAcc)*/
 
  
-  
+   //[]string{"{\"accountID\":\""+accId+"\", \"assetID\":\""+assId+"\", \"amount\":\""+amt+"\"}"}
 
-args = []string{"{\"accountID:\""+accId+"\","+ result[2]+","+result[3]}
+args1 := []string{"{\"accountID\":\""+accId+"\","+ result[2]+","+result[3]}
 	//fmt.Println("to==",toAcc)
-eventBytesTo := []byte(args[0])
-	log.Debugf("createAccount arg: %s", args[0])
-	fmt.Println("args[0]",args[0])
+eventBytesTo := []byte(args1[0])
+	log.Debugf("createAccount arg: %s", args1[0])
+	fmt.Println("args1[0]",args1[0])
 	err = json.Unmarshal(eventBytesTo, &eventTo)
 	
 	
