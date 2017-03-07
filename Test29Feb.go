@@ -3238,35 +3238,32 @@ err = pushRecentState(stub, string(stateJSON),"3")
  ///accId:=argsMap["accountIDTo"].(string)
 //assId:=argsMap["assetID"].(string)
 //amt:=argsMap["amount"].(float64)
- jsonData:=args[0]
+jsonData:=args[0]
  result := strings.Split(jsonData, ",")
  fmt.Println("result of Split=" , result)
  
- fromAcc := make([]string, 3)
+ /* fromAcc := make([]string, 3)
  fromAcc[0] = result[1]
  fromAcc[1] = result[2]
  fromAcc[2] = result[3]
- fmt.Println("fromAcc array=",fromAcc)
+ fmt.Println("fromAcc array=",fromAcc)*/
 
  
- 
-//row1 := []string{"{\"accountID\":\""+accId+"\", \"assetID\":\""+assId+"\", \"amount\":"+amt+"}"}
+  
+row1 := []string{"{\"accountID\":\""+result[1]+"\", \"assetID\":\""+result[2]+"\", \"amount\":"+result[3]+"}"}
 	//fmt.Println("to==",toAcc)
-	fmt.Println("to[0]==",fromAcc[0])
-	eventBytesTo := []byte(fromAcc[0])
+//	fmt.Println("to[0]==",fromAcc[0])
+	eventBytesTo := []byte(row1[0])
 
 	err = json.Unmarshal(eventBytesTo, &eventTo)
 	argsMapTo, found = eventTo.(map[string]interface{})
 	fmt.Println("argsMapTo==", argsMapTo)
-stateJSONIssue, err := json.Marshal(&argsMapTo)
+    stateJSONIssue, err := json.Marshal(&argsMapTo)
 	if err != nil {
 		err := fmt.Errorf("createAccount state for accountID %s failed to marshal", accountID)
 		log.Error(err)
 		return nil, err
 	}
-
-
-
 
 	stateOut = argsMap 
 
