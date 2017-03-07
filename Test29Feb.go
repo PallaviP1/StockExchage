@@ -635,6 +635,7 @@ func (t *SimpleChaincode) deleteAsset(stub shim.ChaincodeStubInterface, args []s
 	var event interface{}
 	var found bool
 	var err error
+	
 
 	if len(args) != 1 {
 		err = errors.New("Expecting one JSON state object with an assetID")
@@ -3013,7 +3014,7 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 	var ledgerBytes interface{}
 	var found bool
 	var err error
-	
+	var args1 []string
 	//var timeIn time.Time
 
 	log.Info("Entering createAsset")
@@ -3252,9 +3253,10 @@ jsonData:=args[0]
   
 row1 := []string{"{\"accountID:\""+accId+"\","+ result[2]+","+result[3]}
 	//fmt.Println("to==",toAcc)
-	fmt.Println("to[0]==",row1[0])
-		fmt.Println("to[0]==",row1)
-	eventBytesTo := []byte(row1[0])
+	args1=row1
+	fmt.Println("row1[0]==",args1[0])
+		fmt.Println("to[0]==",args1)
+	eventBytesTo := []byte(args1[0])
 
 	err = json.Unmarshal(eventBytesTo, &eventTo)
 	argsMapTo, found = eventTo.(map[string]interface{})
