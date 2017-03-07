@@ -2797,8 +2797,10 @@ func (t *SimpleChaincode) issueAsset(stub shim.ChaincodeStubInterface, args []st
 	}
  ledgerMap["amount"] =ledgerMap["amount"].(float64) + argsMap["amount"].( float64)
 
-	stateOut := deepMerge(map[string]interface{}(argsMap),
-		map[string]interface{}(ledgerMap))
+//	stateOut := deepMerge(map[string]interface{}(argsMap),
+//		map[string]interface{}(ledgerMap))
+
+   stateOut := map[string]interface{}(ledgerMap)
 	log.Debugf("updateAsset assetID %s merged state: %s of type %s", assetID, accountID, stateOut)
 
 	// save the original event
