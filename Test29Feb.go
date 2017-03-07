@@ -3404,7 +3404,7 @@ func getTransferActiveAccounts(stub shim.ChaincodeStubInterface) ([]string, erro
     if err != nil {
         return []string{}, err
     }
-    var a = make([]string, len(state.IssueAccounts))
+    var a = make([]string, len(state.TransferAccounts))
     i := 0
     for id := range state.TransferAccounts {
         a[i] = id
