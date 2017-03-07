@@ -3235,7 +3235,7 @@ err = pushRecentState(stub, string(stateJSON),"3")
 
 	} 
 //****************************************
- ///accId:=argsMap["accountIDTo"].(string)
+ accId:=argsMap["accountIDTo"].(string)
 //assId:=argsMap["assetID"].(string)
 //amt:=argsMap["amount"].(float64)
 jsonData:=args[0]
@@ -3250,7 +3250,7 @@ jsonData:=args[0]
 
  
   
-row1 := []string{"{"+result[1]+","+ result[2]+","+result[3]}
+row1 := []string{"{\"accountID:\""+accId+"\","+result[1]+","+ result[2]+","+result[3]}
 	//fmt.Println("to==",toAcc)
 	fmt.Println("to[0]==",row1[0])
 		fmt.Println("to[0]==",row1)
