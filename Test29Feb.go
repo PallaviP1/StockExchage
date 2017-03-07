@@ -3014,7 +3014,7 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 	var ledgerBytes interface{}
 	var found bool
 	var err error
-	var args1 []string
+	
 	//var timeIn time.Time
 
 	log.Info("Entering createAsset")
