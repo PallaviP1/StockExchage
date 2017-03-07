@@ -3316,7 +3316,14 @@ eventBytesTo := []byte(args1[0])
 	}
 //For Transfer
 	// add asset to contract state
-	err = addAccountToContractState(stub, sAccountKeyTo+"_1","transfer")
+err = stub.PutState(sAccountKeyTo+"_Transfer", []byte(stateJSON))
+	if err != nil {
+		err = fmt.Errorf("createAccount accountID %s PUTSTATE failed: %s", accountID, err)
+		log.Error(err)
+		return nil, err
+	}
+
+	err = addAccountToContractState(stub, sAccountKeyTo+"_Transfer","transfer")
 	if err != nil {
 		err := fmt.Errorf("createAccount asset %s  failed to write asset state: %s", accountID,  err)
 		log.Critical(err)
@@ -3337,7 +3344,7 @@ eventBytesTo := []byte(args1[0])
 		log.Critical(err)
 		return nil, err
 	}
-	err = createStateHistory(stub, sAccountKeyTo +"_1", string(stateJSON))
+	err = createStateHistory(stub, sAccountKeyTo +"_Transfer", string(stateJSON))
 	if err != nil {
 		err := fmt.Errorf("createAccount asset %s of type %s state history save failed: %s", accountID, sAccountKeyTo, err)
 		log.Critical(err)
