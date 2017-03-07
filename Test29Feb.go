@@ -3007,9 +3007,9 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 	var assetID string
     var accountID string
 	var argsMap ArgsMap
-		var argsMapTo ArgsMap
+	var argsMapTo ArgsMap
 	var event interface{}
-		var eventTo interface{}
+	var eventTo interface{}
 	var ledgerMap ArgsMap
 	var ledgerBytes interface{}
 	var found bool
@@ -3252,14 +3252,14 @@ jsonData:=args[0]
  
   
 
-args1 = []string{"{\"accountID:\""+accId+"\","+ result[2]+","+result[3]}
+args = []string{"{\"accountID:\""+accId+"\","+ result[2]+","+result[3]}
 	//fmt.Println("to==",toAcc)
-
-	fmt.Println("row1[0]==",args1[0])
-		fmt.Println("to[0]==",args1)
-	eventBytesTo := []byte(args1[0])
-
+eventBytesTo := []byte(args[0])
+	log.Debugf("createAccount arg: %s", args[0])
+	fmt.Println("args[0]",args[0])
 	err = json.Unmarshal(eventBytesTo, &eventTo)
+	
+	
 	argsMapTo, found = eventTo.(map[string]interface{})
 	fmt.Println("argsMapTo==", argsMapTo)
     stateJSONIssue, err := json.Marshal(&argsMapTo)
