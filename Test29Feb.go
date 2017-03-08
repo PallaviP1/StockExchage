@@ -334,9 +334,9 @@ func (t *SimpleChaincode) createAsset(stub shim.ChaincodeStubInterface, args []s
 		}
 	}
 	
-    assetType=argsMap["assetType"].(string)
+   // assetType=argsMap["assetType"].(string)
 	log.Info(assetType)
-	sAssetKey := assetID + "_" + assetType
+	sAssetKey := assetID + "_asset" 
 	found = assetIsActive(stub, sAssetKey)
 	if found {
 		err := fmt.Errorf("createAsset arg asset %s of type %s already exists", assetID, assetType)
@@ -1060,10 +1060,10 @@ func (t *SimpleChaincode) readAsset(stub shim.ChaincodeStubInterface, args []str
 	}
 	sMsg := "Inside readAsset assetName: " + assetName
 	log.Info(sMsg)
-	assetType=argsMap["assetType"].(string)
+	
 	sMsgTyoe := "Inside readAsset assetType: " + assetType
 	log.Info(sMsgTyoe)
-	sAssetKey := assetID + "_" + assetType
+	sAssetKey := assetID + "_asset" 
 	found = assetIsActive(stub, sAssetKey)
 	if !found {
 		err := fmt.Errorf("readAsset arg asset %s of type %s does not exist", assetID, assetType)
