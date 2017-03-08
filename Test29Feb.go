@@ -1060,11 +1060,7 @@ func (t *SimpleChaincode) readAsset(stub shim.ChaincodeStubInterface, args []str
 	}
 	sMsg := "Inside readAsset assetName: " + assetName
 	log.Info(sMsg)
-	if strings.Contains(assetName, "Plug") {
-		assetType = "smartplug"
-	} else {
-		assetType = "motor"
-	}
+	assetType=argsMap["assetType"].(string)
 	sMsgTyoe := "Inside readAsset assetType: " + assetType
 	log.Info(sMsgTyoe)
 	sAssetKey := assetID + "_" + assetType
@@ -2450,7 +2446,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	var err error
 	//var timeIn time.Time
 
-	log.Info("Entering createAsset")
+	log.Info("Entering createAccount")
 
 	// allowing 2 args because updateAsset is allowed to redirect when
 	// asset does not exist
@@ -3015,7 +3011,7 @@ func (t *SimpleChaincode) transferAsset(stub shim.ChaincodeStubInterface, args [
 	
 	//var timeIn time.Time
 
-	log.Info("Entering createAsset")
+	log.Info("Entering transferAsset")
 
 	// allowing 2 args because updateAsset is allowed to redirect when
 	// asset does not exist
