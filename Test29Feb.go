@@ -159,7 +159,7 @@ var log = NewContractLogger(DEFAULTNICKNAME, DEFAULTLOGGINGLEVEL)
 // ************************************
 func main() {
 	err := shim.Start(new(SimpleChaincode))
-	fmt.Println(SimpleChaincode)
+	fmt.Println(err)
 	if err != nil {
 		log.Infof("ERROR starting Simple Chaincode: %s", err)
 	}
